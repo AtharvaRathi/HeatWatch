@@ -1,0 +1,104 @@
+{
+	"info": {
+		"_postman_id": "c62243d6-3e75-4c07-b3c7-1a0e1c01e523",
+		"name": "HeatWatch API",
+		"description": "API collection for HeatWatch (KJS-CES-01)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@heatwatch.com\",\n    \"password\": \"Admin@1234\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Weather",
+			"item": [
+				{
+					"name": "Get Current Weather",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/weather/current?city=Mumbai",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"weather",
+								"current"
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "Mumbai"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Predict",
+			"item": [
+				{
+					"name": "Get Forecast",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/predict/Mumbai",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"predict",
+								"Mumbai"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}
