@@ -1,9 +1,10 @@
-services:
+databases:
   # PostgreSQL Database
-  - type: pgo
-    name: heatwatch-db
+  - name: heatwatch-db
     plan: free
-    postgresMajorVersion: 15
+    postgresMajorVersion: "15"
+
+services:
 
   # Redis for Celery Broker
   - type: redis
