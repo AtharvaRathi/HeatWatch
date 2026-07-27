@@ -1,0 +1,89 @@
+services:
+  # PostgreSQL Database
+  - type: pgo
+    name: heatwatch-db
+    plan: free
+    postgresMajorVersion: 15
+
+  # Redis for Celery Broker
+  - type: redis
+    name: heatwatch-redis
+    plan: free
+    ipAllowList: [] # only allow internal connections
+
+  # FastAPI Web Service
+  - type: web
+    name: heatwatch-api
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heatwatch-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: heatwatch-redis
+          property: connectionString
+      - key: OPENWEATHERMAP_API_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: MAILJET_API_KEY
+        sync: false
+      - key: MAILJET_API_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false # User will set this after Vercel deployment
+
+  # Celery Worker
+  - type: worker
+    name: heatwatch-worker
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A celery_worker.celery_app worker --loglevel=info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heatwatch-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: heatwatch-redis
+          property: connectionString
+      - key: OPENWEATHERMAP_API_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: MAILJET_API_KEY
+        sync: false
+      - key: MAILJET_API_SECRET
+        sync: false
+
+  # Celery Beat (Scheduler)
+  - type: worker
+    name: heatwatch-beat
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A celery_beat.celery_app beat --loglevel=info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heatwatch-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: heatwatch-redis
+          property: connectionString
+      - key: OPENWEATHERMAP_API_KEY
+        sync: false
