@@ -5,8 +5,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "HeatWatch"
     DATABASE_URL: str
     REDIS_URL: str
-    OPENWEATHERMAP_API_KEY: str
-    JWT_SECRET_KEY: str
+    OPENWEATHERMAP_API_KEY: str = ""
+    JWT_SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_EXPIRE_DAYS: int = 7

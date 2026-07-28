@@ -15,13 +15,18 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Check if this is the very first user in the database
+    user_count_result = await db.execute(select(User))
+    is_first_user = len(user_count_result.scalars().all()) == 0
+    
     hashed_password = get_password_hash(user_in.password)
     db_user = User(
         name=user_in.name,
         email=user_in.email,
         password_hash=hashed_password,
         phone=user_in.phone,
-        language_preference=user_in.language_preference
+        language_preference=user_in.language_preference,
+        role="admin" if is_first_user else "user"
     )
     db.add(db_user)
     await db.commit()

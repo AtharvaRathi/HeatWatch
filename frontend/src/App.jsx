@@ -14,6 +14,7 @@ import AdminPage from './pages/AdminPage';
 import AdvisoryPage from './pages/AdvisoryPage';
 import LoginPage from './pages/LoginPage';
 // import RegisterPage from './pages/RegisterPage';
+import useLiveAlerts from './hooks/useLiveAlerts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,10 +33,20 @@ const PrivateRoute = ({ children, requireAdmin }) => {
 };
 
 function App() {
+  // Initialize WebSocket connection for live alerts
+  useLiveAlerts();
+
+  const isMissingApiUrl = !import.meta.env.VITE_API_URL && import.meta.env.PROD;
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-[#0B1120] text-[#F9FAFB] font-sans">
+          {isMissingApiUrl && (
+            <div className="bg-red-900 text-white p-3 text-center text-sm font-bold shadow-lg">
+              WARNING: VITE_API_URL environment variable is missing. The app will attempt to use localhost, which will fail in production. Please configure your Vercel Environment Variables.
+            </div>
+          )}
           <Header />
           <main className="flex-grow container mx-auto px-4 py-8">
             <Routes>

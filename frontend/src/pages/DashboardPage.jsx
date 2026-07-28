@@ -4,6 +4,7 @@ import WeatherCard from '../components/Dashboard/WeatherCard';
 import ForecastChart from '../components/Forecast/ForecastChart';
 import ForecastDayCard from '../components/Forecast/ForecastDayCard';
 import AlertStatusPanel from '../components/Dashboard/AlertStatusPanel';
+import MapWidget from '../components/Dashboard/MapWidget';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { Loader2 } from 'lucide-react';
@@ -72,10 +73,7 @@ export default function DashboardPage() {
               <WeatherCard data={weatherData} />
             ) : null}
             
-            {/* Map Placeholder */}
-            <div className="card h-64 bg-gray-800 flex items-center justify-center">
-              <span className="text-gray-500">Map Widget Loading...</span>
-            </div>
+            <MapWidget city={selectedCity} riskLevel={forecastData?.risk_level} />
           </div>
           
           {/* Right Column: Forecast & Alerts */}
