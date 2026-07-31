@@ -10,14 +10,13 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserResponse)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == user_in.email))
-    existing_user = result.scalars().first()
+    existing_user = await db.scalar(select(User).where(User.email == user_in.email))
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
     from sqlalchemy import func
-    user_count_result = await db.execute(select(func.count()).select_from(User))
-    is_first_user = user_count_result.scalar() == 0
+    user_count = await db.scalar(select(func.count()).select_from(User))
+    is_first_user = user_count == 0
     
     hashed_password = get_password_hash(user_in.password)
     db_user = User(
@@ -35,8 +34,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == login_data.email))
-    user = result.scalars().first()
+    user = await db.scalar(select(User).where(User.email == login_data.email))
     
     if not user or not verify_password(login_data.password, user.password_hash):
         raise HTTPException(
