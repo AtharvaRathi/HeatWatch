@@ -10,27 +10,32 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserResponse)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
-    existing_user = await db.scalar(select(User).where(User.email == user_in.email))
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    from sqlalchemy import func
-    user_count = await db.scalar(select(func.count()).select_from(User))
-    is_first_user = user_count == 0
-    
-    hashed_password = get_password_hash(user_in.password)
-    db_user = User(
-        name=user_in.name,
-        email=user_in.email,
-        password_hash=hashed_password,
-        phone=user_in.phone,
-        language_preference=user_in.language_preference,
-        role="admin" if is_first_user else "user"
-    )
-    db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
+    try:
+        existing_user = await db.scalar(select(User).where(User.email == user_in.email))
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        from sqlalchemy import func
+        user_count = await db.scalar(select(func.count()).select_from(User))
+        is_first_user = user_count == 0
+        
+        hashed_password = get_password_hash(user_in.password)
+        db_user = User(
+            name=user_in.name,
+            email=user_in.email,
+            password_hash=hashed_password,
+            phone=user_in.phone,
+            language_preference=user_in.language_preference,
+            role="admin" if is_first_user else "user"
+        )
+        db.add(db_user)
+        await db.commit()
+        await db.refresh(db_user)
+        return db_user
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        raise HTTPException(status_code=400, detail=f"CRASH: {str(e)} | Trace: {error_msg}")
 
 @router.post("/login", response_model=Token)
 async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
