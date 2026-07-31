@@ -15,9 +15,9 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Check if this is the very first user in the database
-    user_count_result = await db.execute(select(User))
-    is_first_user = len(user_count_result.scalars().all()) == 0
+    from sqlalchemy import func
+    user_count_result = await db.execute(select(func.count()).select_from(User))
+    is_first_user = user_count_result.scalar() == 0
     
     hashed_password = get_password_hash(user_in.password)
     db_user = User(
