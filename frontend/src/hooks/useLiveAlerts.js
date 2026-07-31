@@ -10,7 +10,7 @@ export default function useLiveAlerts() {
     if (!user) return; // Only connect if logged in
 
     // Get the base API URL and convert it to a WebSocket URL
-    let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    let apiUrl = import.meta.env.VITE_API_URL || 'https://heatwatch-api.onrender.com';
     let wsUrl = apiUrl.replace('http://', 'ws://').replace('https://', 'wss://');
     
     // Connect to WebSocket with the user's ID as client ID

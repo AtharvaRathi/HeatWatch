@@ -11,7 +11,7 @@ import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function DashboardPage() {
-  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState('Mumbai');
 
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useQuery({
     queryKey: ['weather', selectedCity],

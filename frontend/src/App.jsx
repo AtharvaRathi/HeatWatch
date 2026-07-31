@@ -13,7 +13,7 @@ import AlertsPage from './pages/AlertsPage';
 import AdminPage from './pages/AdminPage';
 import AdvisoryPage from './pages/AdvisoryPage';
 import LoginPage from './pages/LoginPage';
-// import RegisterPage from './pages/RegisterPage';
+import RegisterPage from './pages/RegisterPage';
 import useLiveAlerts from './hooks/useLiveAlerts';
 
 const queryClient = new QueryClient({
@@ -52,7 +52,7 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
-              {/* <Route path="/register" element={<RegisterPage />} /> */}
+              <Route path="/register" element={<RegisterPage />} />
               
               {/* Protected Routes */}
               <Route path="/" element={<DashboardPage />} />
