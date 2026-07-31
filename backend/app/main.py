@@ -8,6 +8,11 @@ from ml.predict import load_model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from app.database import engine, Base
+    import app.models  # Ensure models are loaded
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        
     load_model()
     yield
     # Cleanup here later

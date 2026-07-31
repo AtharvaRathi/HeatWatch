@@ -1,9 +1,7 @@
 #!/bin/bash
 set -e
 
-# 1. Run database migrations
-echo "Running database migrations..."
-alembic upgrade head
+# 1. Run database migrations is now handled by FastAPI lifespan on startup
 
 # 2. Start Celery worker in the background
 echo "Starting Celery worker..."
