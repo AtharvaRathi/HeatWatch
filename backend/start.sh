@@ -7,7 +7,7 @@ alembic upgrade head
 
 # 2. Start Celery worker in the background
 echo "Starting Celery worker..."
-celery -A celery_worker.celery_app worker --loglevel=info &
+celery -A celery_worker.celery_app worker --pool=solo --loglevel=info &
 
 # 3. Start Celery beat (scheduler) in the background
 echo "Starting Celery beat scheduler..."
