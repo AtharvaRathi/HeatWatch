@@ -67,9 +67,24 @@ async def _evaluate_thresholds():
                             # Notify users (for simplicity, notify all users right now, usually you'd notify users in that region)
                             users_res = await session.execute(select(User).where(User.is_active == True))
                             users = users_res.scalars().all()
+                            
+                            import json
+                            import redis.asyncio as redis_async
+                            redis_client = redis_async.from_url(settings.REDIS_URL)
+                            
                             for u in users:
                                 session.add(UserAlert(user_id=u.id, alert_id=new_alert.id))
+                                await redis_client.publish(
+                                    "user_alerts",
+                                    json.dumps({
+                                        "type": "alert",
+                                        "user_id": str(u.id),
+                                        "title": f"Severe Heat Alert: {region.city_name}",
+                                        "message": f"Heat index reached {heat_index:.1f}°C. Risk Level: {prediction['risk_level']}"
+                                    })
+                                )
                                 
+                            await redis_client.aclose()
                 except Exception as e:
                     print(f"Error evaluating threshold for {region.city_name}: {e}")
                     

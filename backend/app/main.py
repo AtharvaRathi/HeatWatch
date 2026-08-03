@@ -13,6 +13,10 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         
+    import asyncio
+    from app.routers.websocket import listen_for_alerts
+    asyncio.create_task(listen_for_alerts())
+    
     load_model()
     yield
     # Cleanup here later

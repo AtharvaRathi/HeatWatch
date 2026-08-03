@@ -11,6 +11,7 @@ import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
 import AlertsPage from './pages/AlertsPage';
 import AdminPage from './pages/AdminPage';
+import AccountPage from './pages/AccountPage';
 import AdvisoryPage from './pages/AdvisoryPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -59,6 +60,11 @@ function App() {
               <Route path="/history" element={
                 <PrivateRoute>
                   <HistoryPage />
+                </PrivateRoute>
+              } />
+              <Route path="/account" element={
+                <PrivateRoute>
+                  <AccountPage />
                 </PrivateRoute>
               } />
               <Route path="/alerts" element={

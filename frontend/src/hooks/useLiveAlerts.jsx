@@ -15,7 +15,7 @@ export default function useLiveAlerts() {
     
     // Connect to WebSocket with the user's ID as client ID
     const connectWs = () => {
-      const ws = new WebSocket(`${wsUrl}/api/websocket/ws/${user.id}`);
+      const ws = new WebSocket(`${wsUrl}/api/ws/alerts/${user.id}`);
       
       ws.onopen = () => {
         console.log('Connected to HeatWatch Live Feed');

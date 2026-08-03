@@ -52,3 +52,24 @@ async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     refresh_token = create_refresh_token(data={"id": str(user.id), "role": user.role})
     
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+from app.routers.deps import get_current_user
+
+@router.get("/me", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+from app.schemas.user import UserUpdate
+
+@router.put("/me", response_model=UserResponse)
+async def update_user_me(user_update: UserUpdate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if user_update.name is not None:
+        current_user.name = user_update.name
+    if user_update.phone is not None:
+        current_user.phone = user_update.phone
+    if user_update.language_preference is not None:
+        current_user.language_preference = user_update.language_preference
+        
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user
