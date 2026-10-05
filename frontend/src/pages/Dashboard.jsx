@@ -293,21 +293,27 @@ const Dashboard = () => {
               </Link>
             </div>
             
-            <div className="p-5 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-3 relative overflow-hidden backdrop-blur-md">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/20 blur-[40px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
-              
-              <div className="flex justify-between items-center relative z-10">
-                <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase">
-                  {alerts[0].level}
-                </span>
-                <span className="font-light text-rose-300 text-sm">{alerts[0].temp}</span>
+            {alerts && alerts.length > 0 ? (
+              <div className="p-5 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-3 relative overflow-hidden backdrop-blur-md">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/20 blur-[40px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+                
+                <div className="flex justify-between items-center relative z-10">
+                  <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase">
+                    {alerts[0].level}
+                  </span>
+                  <span className="font-light text-rose-300 text-sm">{alerts[0].temp}</span>
+                </div>
+                <h3 className="font-light text-sm text-white relative z-10">{alerts[0].title}</h3>
+                <p className="text-[12px] font-light text-rose-200/70 leading-relaxed relative z-10">{alerts[0].description}</p>
+                <div className="text-[10px] text-rose-300/50 font-mono pt-2 relative z-10 border-t border-rose-500/20">
+                  Loc: {alerts[0].city}, {alerts[0].state}
+                </div>
               </div>
-              <h3 className="font-light text-sm text-white relative z-10">{alerts[0].title}</h3>
-              <p className="text-[12px] font-light text-rose-200/70 leading-relaxed relative z-10">{alerts[0].description}</p>
-              <div className="text-[10px] text-rose-300/50 font-mono pt-2 relative z-10 border-t border-rose-500/20">
-                Loc: {alerts[0].city}, {alerts[0].state}
+            ) : (
+              <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center py-8">
+                <p className="text-sm font-light text-white/50">No active critical alerts.</p>
               </div>
-            </div>
+            )}
           </div>
         </motion.div>
 
