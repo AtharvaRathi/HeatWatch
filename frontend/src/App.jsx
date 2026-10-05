@@ -5,8 +5,6 @@ import { ThemeProvider } from './context/ThemeContext';
 // Components & Layout
 import Layout from './components/Layout';
 
-// Pages
-import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import WeatherMonitoring from './pages/WeatherMonitoring';
 import InteractiveHeatMap from './pages/InteractiveHeatMap';
@@ -23,8 +21,8 @@ function App() {
     <ThemeProvider>
       <Router>
         <Routes>
-          {/* Landing Page */}
-          <Route path="/" element={<LandingPage />} />
+          {/* Redirect root to Dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
           {/* App Dashboard Routes wrapped inside Layout */}
           <Route

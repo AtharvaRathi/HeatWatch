@@ -1,16 +1,63 @@
-# React + Vite
+# HeatWatch 🌡️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HeatWatch is a modern, responsive web application designed to monitor, predict, and analyze heatwaves across India. It provides real-time alerts, interactive maps, and AI-driven advisories to help users stay safe during extreme heat conditions.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Interactive Heat Map**: Visual representation of heat distributions and hotspots across India using `react-simple-maps`.
+- **Dashboard & Analytics**: Comprehensive data visualization using `recharts` for tracking temperature trends and historical data.
+- **AI Advisory Generator**: Smart, context-aware suggestions and advisories to mitigate heatwave impacts.
+- **Alerts & Early Warning System**: Timely notifications about severe weather conditions and heatwave warnings.
+- **Weather Monitoring**: Real-time updates on local weather metrics.
+- **Heatwave Hotspots**: Detailed tracking of regions with dangerously high temperatures.
+- **Responsive Design**: Built with Tailwind CSS and Framer Motion for a sleek, modern, and fully responsive user experience.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) & [Locomotive Scroll](https://locomotivemtl.github.io/locomotive-scroll/)
+- **Data Visualization**: [Recharts](https://recharts.org/)
+- **Maps**: [React Simple Maps](https://www.react-simple-maps.io/)
+- **Routing**: [React Router](https://reactrouter.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Expanding the ESLint configuration
+## 📦 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+Make sure you have Node.js and npm (or yarn/pnpm) installed on your machine.
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/AtharvaRathi/HeatWatch.git
+   cd HeatWatch
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+## 🧪 Testing
+
+The project uses Vitest and Stryker for testing.
+
+- Run unit tests: `npm run test`
+- Run mutation testing: `npm run test:mutation`
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).

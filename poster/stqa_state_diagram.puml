@@ -1,0 +1,37 @@
+@startuml
+skinparam shadowing false
+skinparam state {
+    BorderColor #333333
+    BorderThickness 1.5
+    FontName Roboto
+    FontColor #333333
+}
+skinparam arrowColor #666666
+skinparam arrowThickness 1.5
+skinparam arrowFontColor #333333
+skinparam defaultTextAlignment center
+skinparam BackgroundColor white
+
+title State Transition Diagram: ThermaGuard AI Alerts
+
+state "Normal Weather\n<size:12>< 35°C</size>" as Normal #e3f2fd
+state "Yellow Advisory\n<size:12>35-40°C</size>" as Yellow #fff9c4
+state "Orange Alert\n<size:12>40-45°C</size>" as Orange #ffe0b2
+state "Red Warning\n<size:12>> 45°C</size>" as Red #ffcdd2
+
+[*] --> Normal : System Start
+
+Normal -right-> Yellow : T1 (Temp > 35°C)
+Yellow -left-> Normal : T6 (Temp < 35°C)
+
+Yellow -down-> Orange : T2 (Temp > 40°C)
+Orange -up-> Yellow : T5 (Temp < 40°C)
+
+Orange -down-> Red : T3 (Temp > 45°C)
+Red -up-> Orange : T4 (Temp < 45°C)
+
+' Extreme Jumps (Edge Cases)
+Normal -down-> Orange : Rapid Temp Spike > 40°C
+Yellow -down-> Red : Rapid Temp Spike > 45°C
+
+@enduml

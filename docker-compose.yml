@@ -1,0 +1,130 @@
+# ============================================
+# DOCKER COMPOSE - MICROSERVICES ARCHITECTURE
+# ============================================
+# Run: docker-compose up --build
+# This starts 4 independent microservices,
+# each with its own database, plus Nginx
+# API Gateway and the React frontend.
+# ============================================
+
+services:
+
+  # ---- MongoDB Database ----
+  mongodb:
+    image: mongo:7.0
+    container_name: heatwave-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- Weather Microservice ----
+  weather-service:
+    build:
+      context: ./backend/microservices/weather-service
+      dockerfile: Dockerfile
+    container_name: heatwave-weather-service
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - MONGO_URI=mongodb://mongodb:27017/heatwave_weather
+    depends_on:
+      - mongodb
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- Alert Microservice ----
+  alert-service:
+    build:
+      context: ./backend/microservices/alert-service
+      dockerfile: Dockerfile
+    container_name: heatwave-alert-service
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - MONGO_URI=mongodb://mongodb:27017/heatwave_alerts
+    depends_on:
+      - mongodb
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- Advisory Microservice ----
+  advisory-service:
+    build:
+      context: ./backend/microservices/advisory-service
+      dockerfile: Dockerfile
+    container_name: heatwave-advisory-service
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - MONGO_URI=mongodb://mongodb:27017/heatwave_advisory
+    depends_on:
+      - mongodb
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- Analytics Microservice ----
+  analytics-service:
+    build:
+      context: ./backend/microservices/analytics-service
+      dockerfile: Dockerfile
+    container_name: heatwave-analytics-service
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - MONGO_URI=mongodb://mongodb:27017/heatwave_analytics
+    depends_on:
+      - mongodb
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- React Frontend ----
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: heatwave-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+  # ---- Nginx API Gateway ----
+  nginx-gateway:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: heatwave-nginx-gateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - weather-service
+      - alert-service
+      - advisory-service
+      - analytics-service
+      - frontend
+    networks:
+      - heatwave-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  heatwave-network:
+    driver: bridge

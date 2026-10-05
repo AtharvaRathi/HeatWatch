@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchDashboardStats, fetchAnalyticsTrends, fetchCitiesWeather, fetchAlerts, fetchWeeklyForecast } from '../services/api';
 import { 
   ThermometerSun, 
   AlertTriangle, 
   MapPin, 
   Flame, 
   Target, 
-  Clock, 
   ChevronRight, 
-  Wind,
-  Droplets
 } from 'lucide-react';
-import StatisticCard from '../components/StatisticCard';
-import AlertCard from '../components/AlertCard';
 import { 
   mockDashboardStats, 
   mockWeeklyForecast, 
@@ -20,101 +16,168 @@ import {
   mockAlerts, 
   mockAnalyticsData 
 } from '../data/mockData';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const Dashboard = () => {
   const [selectedCityTrend, setSelectedCityTrend] = useState('Nagpur');
 
+  // API data state with mockData fallback
+  const [dashboardStats, setDashboardStats] = useState(mockDashboardStats);
+  const [weeklyForecast, setWeeklyForecast] = useState(mockWeeklyForecast);
+  const [hotspots, setHotspots] = useState(mockHotspots);
+  const [alerts, setAlerts] = useState(mockAlerts);
+  const [analyticsData, setAnalyticsData] = useState(mockAnalyticsData);
+
+  // Fetch from backend API on mount, fallback to mockData
+  useEffect(() => {
+    const loadData = async () => {
+      const [statsRes, forecastRes, citiesRes, alertsRes, trendsRes] = await Promise.all([
+        fetchDashboardStats(),
+        fetchWeeklyForecast(),
+        fetchCitiesWeather(),
+        fetchAlerts(),
+        fetchAnalyticsTrends()
+      ]);
+
+      if (statsRes) setDashboardStats(statsRes);
+      if (forecastRes) setWeeklyForecast(forecastRes);
+      if (citiesRes) {
+        const sorted = citiesRes
+          .map((item, index) => ({ ...item, rank: index + 1, riskColor: item.statusColor }))
+          .sort((a, b) => b.riskScore - a.riskScore);
+        setHotspots(sorted);
+      }
+      if (alertsRes) setAlerts(alertsRes);
+      if (trendsRes) setAnalyticsData(trendsRes);
+    };
+    loadData();
+  }, []);
+
+
   return (
-    <div className="space-y-8">
+    <motion.div 
+      initial="hidden"
+      animate="show"
+      variants={containerVariants}
+      className="space-y-6"
+    >
       
       {/* Clean Minimalist Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2 border-b border-stone-200/60">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-stone-900 tracking-tight">Dashboard Overview</h1>
-          <p className="text-xs text-stone-500 mt-0.5">
+          <h1 className="text-3xl font-light text-white tracking-tight flex items-center gap-3">
+            <ThermometerSun size={28} strokeWidth={1.5} className="text-amber-400" />
+            Dashboard Overview
+          </h1>
+          <p className="text-sm font-light text-white/60 mt-1">
             Real-time heatwave telemetry and 72-hour AI model predictions.
           </p>
         </div>
         <Link 
           to="/ai-advisory"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold transition shadow-xs"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/30 hover:bg-amber-500/30 text-amber-400 text-sm font-medium transition backdrop-blur-md"
         >
           <span>AI Advisory Generator</span>
-          <ChevronRight size={14} />
+          <ChevronRight size={16} />
         </Link>
-      </div>
+      </motion.div>
 
       {/* TOP CARDS (5 Minimalist KPIs) */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <motion.div variants={containerVariants} className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         
-        <div className="bg-white p-5 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between text-stone-400">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500">Avg Temperature</span>
-            <ThermometerSun size={18} className="text-amber-700" />
+        <motion.div variants={itemVariants} className="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between text-white/50">
+            <span className="text-[10px] font-medium uppercase tracking-widest">Avg Temperature</span>
+            <ThermometerSun size={18} strokeWidth={1.5} className="text-amber-400" />
           </div>
-          <div className="text-2xl font-extrabold text-stone-900">{mockDashboardStats.currentAvgTemp}</div>
-          <p className="text-[11px] text-stone-400 truncate">{mockDashboardStats.avgTempTrend}</p>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between text-stone-400">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500">Active Alerts</span>
-            <AlertTriangle size={18} className="text-rose-700" />
+          <div>
+            <div className="text-3xl font-light text-white">{dashboardStats.currentAvgTemp}</div>
+            <p className="text-[11px] font-light text-white/50 mt-1 truncate">{dashboardStats.avgTempTrend}</p>
           </div>
-          <div className="text-2xl font-extrabold text-stone-900">{mockDashboardStats.activeAlertsCount}</div>
-          <p className="text-[11px] text-stone-400 truncate">{mockDashboardStats.alertsBreakdown}</p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white p-5 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between text-stone-400">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500">Affected Regions</span>
-            <MapPin size={18} className="text-amber-800" />
+        <motion.div variants={itemVariants} className="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between text-white/50">
+            <span className="text-[10px] font-medium uppercase tracking-widest">Active Alerts</span>
+            <AlertTriangle size={18} strokeWidth={1.5} className="text-rose-400" />
           </div>
-          <div className="text-2xl font-extrabold text-stone-900">{mockDashboardStats.affectedRegionsCount}</div>
-          <p className="text-[11px] text-stone-400 truncate">{mockDashboardStats.affectedRegionsDetail}</p>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between text-stone-400">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500">Highest Recorded</span>
-            <Flame size={18} className="text-rose-800" />
+          <div>
+            <div className="text-3xl font-light text-white">{dashboardStats.activeAlertsCount}</div>
+            <p className="text-[11px] font-light text-white/50 mt-1 truncate">{dashboardStats.alertsBreakdown}</p>
           </div>
-          <div className="text-2xl font-extrabold text-stone-900">{mockDashboardStats.highestRecordedTemp}</div>
-          <p className="text-[11px] text-stone-400 truncate">{mockDashboardStats.highestLocation}</p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white p-5 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between space-y-2 col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between text-stone-400">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-stone-500">Prediction Accuracy</span>
-            <Target size={18} className="text-emerald-700" />
+        <motion.div variants={itemVariants} className="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between text-white/50">
+            <span className="text-[10px] font-medium uppercase tracking-widest">Affected Regions</span>
+            <MapPin size={18} strokeWidth={1.5} className="text-amber-400" />
           </div>
-          <div className="text-2xl font-extrabold text-stone-900">{mockDashboardStats.predictionAccuracy}</div>
-          <p className="text-[11px] text-stone-400 truncate">{mockDashboardStats.accuracyDetail}</p>
-        </div>
+          <div>
+            <div className="text-3xl font-light text-white">{dashboardStats.affectedRegionsCount}</div>
+            <p className="text-[11px] font-light text-white/50 mt-1 truncate">{dashboardStats.affectedRegionsDetail}</p>
+          </div>
+        </motion.div>
 
-      </div>
+        <motion.div variants={itemVariants} className="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between text-white/50">
+            <span className="text-[10px] font-medium uppercase tracking-widest">Highest Recorded</span>
+            <Flame size={18} strokeWidth={1.5} className="text-rose-400" />
+          </div>
+          <div>
+            <div className="text-3xl font-light text-white">{dashboardStats.highestRecordedTemp}</div>
+            <p className="text-[11px] font-light text-white/50 mt-1 truncate">{dashboardStats.highestLocation}</p>
+          </div>
+        </motion.div>
+
+        <motion.div variants={itemVariants} className="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between text-white/50">
+            <span className="text-[10px] font-medium uppercase tracking-widest">Model Accuracy</span>
+            <Target size={18} strokeWidth={1.5} className="text-emerald-400" />
+          </div>
+          <div>
+            <div className="text-3xl font-light text-white">{dashboardStats.predictionAccuracy}</div>
+            <p className="text-[11px] font-light text-white/50 mt-1 truncate">{dashboardStats.accuracyDetail}</p>
+          </div>
+        </motion.div>
+
+      </motion.div>
 
       {/* MIDDLE SECTION: Temperature Trend Chart & Weekly Forecast */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* 7-Day Temperature Trend (2 Cols) */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <motion.div variants={itemVariants} className="lg:col-span-2 glass-card p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+          
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 relative z-10">
             <div>
-              <h2 className="text-base font-bold text-stone-900">7-Day Temperature Trend</h2>
-              <p className="text-xs text-stone-500">Max daytime temperature readings (°C)</p>
+              <h2 className="text-lg font-light text-white">7-Day Temperature Trend</h2>
+              <p className="text-xs font-light text-white/50 mt-0.5">Max daytime temperature readings (°C)</p>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5 p-1 glass-input rounded-xl border-white/5">
               {['Nagpur', 'Jaipur', 'Delhi', 'Ahmedabad'].map((city) => (
                 <button
                   key={city}
                   onClick={() => setSelectedCityTrend(city)}
-                  className={`px-2.5 py-1 rounded text-xs font-medium transition ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     selectedCityTrend === city 
-                      ? 'bg-stone-900 text-white font-semibold' 
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                      : 'text-white/50 hover:text-white/90 hover:bg-white/5 border border-transparent'
                   }`}
                 >
                   {city}
@@ -123,88 +186,93 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="w-full h-[260px]">
+          <div className="w-full h-[280px] relative z-10">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockAnalyticsData.tempTrend7Days}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f4" />
-                <XAxis dataKey="date" stroke="#a8a29e" fontSize={11} />
-                <YAxis domain={[35, 48]} stroke="#a8a29e" fontSize={11} unit="°" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1c1917', borderColor: '#44403c', borderRadius: '6px', color: '#fff', fontSize: '11px' }}
-                />
-                <Line 
+              <AreaChart data={analyticsData.tempTrend7Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} dy={10} />
+                <YAxis domain={[35, 48]} tickLine={false} axisLine={false} dx={-10} unit="°" />
+                <Tooltip />
+                <Area 
                   type="monotone" 
                   dataKey={selectedCityTrend} 
-                  stroke="#b45309" 
-                  strokeWidth={2} 
-                  dot={{ r: 3, fill: '#b45309' }}
+                  stroke="#f59e0b" 
+                  strokeWidth={2}
+                  fill="url(#colorTrend)" 
+                  activeDot={{ r: 6, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Weekly Forecast (1 Col) */}
-        <div className="bg-white p-6 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between">
+        <motion.div variants={itemVariants} className="glass-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-base font-bold text-stone-900">Weekly Forecast</h2>
-              <span className="text-[10px] font-mono text-stone-400">7 Days</span>
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <h2 className="text-lg font-light text-white">Weekly Forecast</h2>
+              <span className="text-[10px] font-mono font-medium tracking-widest text-white/40 uppercase">7 Days</span>
             </div>
 
-            <div className="space-y-2">
-              {mockWeeklyForecast.map((fc, idx) => (
-                <div key={idx} className="flex items-center justify-between py-1.5 border-b border-stone-100 last:border-0 text-xs">
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-stone-900 w-8">{fc.day}</span>
-                    <span className="text-stone-400 text-[11px]">{fc.date}</span>
+            <div className="space-y-1">
+              {weeklyForecast.map((fc, idx) => (
+                <div key={idx} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0 hover:bg-white/5 px-2 -mx-2 rounded-lg transition-colors">
+                  <div className="flex items-center gap-4">
+                    <span className="font-light text-white w-8">{fc.day}</span>
+                    <span className="text-white/40 text-[11px] font-light">{fc.date}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${
-                      fc.code === 'red' ? 'bg-rose-50 text-rose-800' :
-                      fc.code === 'orange' ? 'bg-amber-50 text-amber-900' :
-                      fc.code === 'yellow' ? 'bg-stone-100 text-stone-700' :
-                      'bg-emerald-50 text-emerald-800'
+                  <div className="flex items-center gap-4">
+                    <span className={`text-[10px] font-medium tracking-wide uppercase px-2 py-0.5 rounded-md border ${
+                      fc.code === 'red' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
+                      fc.code === 'orange' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                      fc.code === 'yellow' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                      'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                     }`}>
                       {fc.status}
                     </span>
-                    <div className="text-right w-12 font-mono text-[11px]">
-                      <span className="font-bold text-stone-900">{fc.maxTemp}°</span>
-                      <span className="text-stone-400 ml-1">{fc.minTemp}°</span>
+                    <div className="text-right w-12 font-light text-sm">
+                      <span className="text-white">{fc.maxTemp}°</span>
+                      <span className="text-white/40 ml-1.5">{fc.minTemp}°</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
       {/* LOWER SECTION: Hotspots, Alert Highlight, Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Top Hotspots Mini List */}
-        <div className="bg-white p-6 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between">
+        <motion.div variants={itemVariants} className="glass-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-base font-bold text-stone-900">Top Hotspots</h2>
-              <Link to="/hotspots" className="text-xs text-stone-500 hover:text-stone-900 transition">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <h2 className="text-lg font-light text-white">Top Hotspots</h2>
+              <Link to="/hotspots" className="text-xs font-light text-amber-400 hover:text-amber-300 transition">
                 View All →
               </Link>
             </div>
 
-            <div className="divide-y divide-stone-100">
-              {mockHotspots.slice(0, 4).map((spot) => (
-                <div key={spot.id} className="py-2.5 flex justify-between items-center text-xs">
+            <div className="divide-y divide-white/5">
+              {hotspots.slice(0, 4).map((spot) => (
+                <div key={spot.id} className="py-3 flex justify-between items-center hover:bg-white/5 px-2 -mx-2 rounded-lg transition-colors">
                   <div>
-                    <span className="font-bold text-stone-900">{spot.city}</span>
-                    <span className="text-stone-400 ml-1 text-[11px]">({spot.state})</span>
+                    <span className="font-light text-white text-sm">{spot.city}</span>
+                    <span className="text-white/40 ml-2 text-[11px] font-light">({spot.state})</span>
                   </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-extrabold text-stone-900">{spot.temp}°C</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                      spot.riskColor === 'red' ? 'bg-rose-50 text-rose-800' : 'bg-amber-50 text-amber-900'
+                  <div className="flex items-center gap-3">
+                    <span className="font-light text-white">{spot.temp}°C</span>
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium tracking-wide border ${
+                      spot.riskColor === 'red' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                     }`}>
                       Risk {spot.riskScore}
                     </span>
@@ -213,46 +281,48 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Latest Critical Alert Highlight */}
-        <div className="bg-white p-6 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between">
+        <motion.div variants={itemVariants} className="glass-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-bold text-stone-900">Latest Active Alert</h2>
-              <Link to="/alerts" className="text-xs text-stone-500 hover:text-stone-900 transition">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+              <h2 className="text-lg font-light text-white">Latest Critical Alert</h2>
+              <Link to="/alerts" className="text-xs font-light text-amber-400 hover:text-amber-300 transition">
                 All Alerts →
               </Link>
             </div>
             
-            <div className="p-4 rounded-lg bg-stone-50 border border-stone-200/60 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-900 uppercase">
-                  {mockAlerts[0].level}
+            <div className="p-5 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-3 relative overflow-hidden backdrop-blur-md">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/20 blur-[40px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+              
+              <div className="flex justify-between items-center relative z-10">
+                <span className="text-[10px] font-bold tracking-widest px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase">
+                  {alerts[0].level}
                 </span>
-                <span className="font-bold text-stone-900 text-sm">{mockAlerts[0].temp}</span>
+                <span className="font-light text-rose-300 text-sm">{alerts[0].temp}</span>
               </div>
-              <h3 className="font-bold text-xs text-stone-900">{mockAlerts[0].title}</h3>
-              <p className="text-[11px] text-stone-600 leading-relaxed">{mockAlerts[0].description}</p>
-              <div className="text-[10px] text-stone-400 font-mono pt-1">
-                Location: {mockAlerts[0].city}, {mockAlerts[0].state}
+              <h3 className="font-light text-sm text-white relative z-10">{alerts[0].title}</h3>
+              <p className="text-[12px] font-light text-rose-200/70 leading-relaxed relative z-10">{alerts[0].description}</p>
+              <div className="text-[10px] text-rose-300/50 font-mono pt-2 relative z-10 border-t border-rose-500/20">
+                Loc: {alerts[0].city}, {alerts[0].state}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Activities */}
-        <div className="bg-white p-6 rounded-xl border border-stone-200/80 shadow-xs flex flex-col justify-between">
+        <motion.div variants={itemVariants} className="glass-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <h2 className="text-base font-bold text-stone-900 mb-4">Recent System Log</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg font-light text-white mb-6 border-b border-white/10 pb-4">Recent System Log</h2>
+            <div className="space-y-4">
               {mockRecentActivities.slice(0, 4).map((act) => (
-                <div key={act.id} className="flex items-start gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-stone-400 mt-1.5 shrink-0" />
-                  <div className="flex-1 pb-2 border-b border-stone-100 last:border-0">
-                    <h4 className="font-semibold text-xs text-stone-900">{act.title}</h4>
-                    <p className="text-[11px] text-stone-500">{act.target}</p>
-                    <span className="text-[10px] text-stone-400 font-mono block mt-0.5">
+                <div key={act.id} className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                  <div className="flex-1 pb-3 border-b border-white/5 last:border-0">
+                    <h4 className="font-light text-[13px] text-white/90">{act.title}</h4>
+                    <p className="text-[11px] font-light text-white/50 mt-0.5">{act.target}</p>
+                    <span className="text-[9px] tracking-widest text-white/30 font-mono block mt-1.5 uppercase">
                       {act.time}
                     </span>
                   </div>
@@ -260,11 +330,11 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
-    </div>
+    </motion.div>
   );
 };
 

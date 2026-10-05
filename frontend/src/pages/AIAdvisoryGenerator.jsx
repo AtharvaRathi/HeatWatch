@@ -13,6 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { mockAIAdvisoryPresets } from '../data/mockData';
+import { motion } from 'framer-motion';
 
 const AIAdvisoryGenerator = () => {
   const [city, setCity] = useState('Nagpur');
@@ -59,16 +60,22 @@ const AIAdvisoryGenerator = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+    >
       
       {/* Title */}
-      <div className="bg-[#1C1B1A] text-stone-200 p-6 rounded-xl border border-stone-800 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-amber-500 text-xs font-mono mb-1">
-            <Sparkles size={14} /> AI GENERATIVE ADVISORY MODEL
+      <div className="glass-card p-8 rounded-2xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-amber-400 text-[10px] uppercase tracking-widest font-mono mb-2">
+            <Sparkles size={14} /> AI Generative Advisory Model
           </div>
-          <h1 className="text-2xl font-extrabold text-white">AI Advisory Generator</h1>
-          <p className="text-stone-400 text-xs mt-1">
+          <h1 className="text-3xl font-light text-white tracking-tight">AI Advisory Generator</h1>
+          <p className="text-white/50 text-sm font-light mt-1">
             Synthesize domain-specific advisories for Citizens, Farmers, Hospitals, and Municipalities.
           </p>
         </div>
@@ -78,56 +85,56 @@ const AIAdvisoryGenerator = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* LEFT FORM (5 Cols) */}
-        <div className="lg:col-span-5 bg-white rounded-xl p-6 border border-stone-200 shadow-xs space-y-4">
-          <h2 className="text-base font-extrabold text-stone-900 flex items-center gap-2">
-            <Bot className="text-amber-800" size={20} /> Input Parameters
+        <div className="lg:col-span-5 glass-card rounded-2xl p-6 space-y-6">
+          <h2 className="text-lg font-light text-white flex items-center gap-3">
+            <Bot className="text-amber-400" size={20} strokeWidth={1.5} /> Input Parameters
           </h2>
 
-          <form onSubmit={handleGenerate} className="space-y-3.5">
+          <form onSubmit={handleGenerate} className="space-y-5">
             
             {/* City */}
             <div>
-              <label className="text-xs font-bold text-stone-700 block mb-1">City / District</label>
+              <label className="text-[10px] font-medium tracking-widest uppercase text-white/40 block mb-2">City / District</label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="e.g. Nagpur"
-                className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium focus:outline-none"
+                className="w-full px-4 py-2.5 glass-input rounded-xl text-sm font-light text-white transition-all"
               />
             </div>
 
             {/* Temp & Severity */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-stone-700 block mb-1">Max Temp (°C)</label>
+                <label className="text-[10px] font-medium tracking-widest uppercase text-white/40 block mb-2">Max Temp (°C)</label>
                 <input
                   type="text"
                   value={temp}
                   onChange={(e) => setTemp(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium focus:outline-none"
+                  className="w-full px-4 py-2.5 glass-input rounded-xl text-sm font-light text-white transition-all"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-stone-700 block mb-1">Severity</label>
+                <label className="text-[10px] font-medium tracking-widest uppercase text-white/40 block mb-2">Severity</label>
                 <select
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value)}
-                  className="w-full py-2 px-3 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium focus:outline-none"
+                  className="w-full py-2.5 px-4 glass-input rounded-xl text-sm font-light text-white appearance-none"
                 >
-                  <option value="Severe (Red)">Severe (Red)</option>
-                  <option value="Heatwave (Orange)">Heatwave (Orange)</option>
-                  <option value="Warning (Yellow)">Warning (Yellow)</option>
-                  <option value="Normal (Green)">Normal (Green)</option>
+                  <option value="Severe (Red)" className="bg-[#1a1a1e]">Severe (Red)</option>
+                  <option value="Heatwave (Orange)" className="bg-[#1a1a1e]">Heatwave (Orange)</option>
+                  <option value="Warning (Yellow)" className="bg-[#1a1a1e]">Warning (Yellow)</option>
+                  <option value="Normal (Green)" className="bg-[#1a1a1e]">Normal (Green)</option>
                 </select>
               </div>
             </div>
 
             {/* Target Audience */}
             <div>
-              <label className="text-xs font-bold text-stone-700 block mb-1.5">Target Audience</label>
-              <div className="grid grid-cols-2 gap-2">
+              <label className="text-[10px] font-medium tracking-widest uppercase text-white/40 block mb-3">Target Audience</label>
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: 'Citizen', icon: Users, label: 'Citizen' },
                   { id: 'Farmer', icon: Tractor, label: 'Farmer' },
@@ -141,13 +148,13 @@ const AIAdvisoryGenerator = () => {
                       type="button"
                       key={aud.id}
                       onClick={() => setAudience(aud.id)}
-                      className={`flex items-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition ${
+                      className={`flex items-center gap-2 p-3 rounded-xl border text-xs font-light transition-all ${
                         isSelected 
-                          ? 'bg-stone-900 text-white border-stone-900' 
-                          : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' 
+                          : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                       }`}
                     >
-                      <IconComp size={15} /> {aud.label}
+                      <IconComp size={16} strokeWidth={1.5} /> {aud.label}
                     </button>
                   );
                 })}
@@ -158,15 +165,15 @@ const AIAdvisoryGenerator = () => {
             <button
               type="submit"
               disabled={isGenerating}
-              className="w-full py-2.5 px-4 rounded-lg bg-stone-900 hover:bg-amber-900 text-white font-bold text-xs flex items-center justify-center gap-2 transition disabled:opacity-50 shadow-xs"
+              className="w-full py-3 px-4 rounded-xl glass-card hover:bg-amber-500/20 border-white/10 hover:border-amber-500/30 text-white font-medium text-sm flex items-center justify-center gap-2 transition disabled:opacity-50"
             >
               {isGenerating ? (
                 <>
-                  <RefreshCw size={15} className="animate-spin" /> Generating...
+                  <RefreshCw size={16} className="animate-spin" /> Synthesizing Data...
                 </>
               ) : (
                 <>
-                  <Sparkles size={15} className="text-amber-400" /> Generate Advisory
+                  <Sparkles size={16} className="text-amber-400" /> Generate Advisory
                 </>
               )}
             </button>
@@ -174,14 +181,14 @@ const AIAdvisoryGenerator = () => {
           </form>
 
           {/* Quick Presets */}
-          <div className="pt-3 border-t border-stone-100">
-            <span className="text-[10px] font-bold uppercase text-stone-400 block mb-1.5">Quick Presets</span>
-            <div className="flex flex-wrap gap-1.5">
+          <div className="pt-4 border-t border-white/10 mt-6">
+            <span className="text-[10px] font-medium uppercase tracking-widest text-white/30 block mb-3">Quick Prompts</span>
+            <div className="flex flex-wrap gap-2">
               {mockAIAdvisoryPresets.map((preset, i) => (
                 <button
                   key={i}
                   onClick={() => handlePresetSelect(preset)}
-                  className="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded text-[11px] font-semibold transition border border-stone-200"
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-lg text-[11px] font-light transition border border-white/5"
                 >
                   {preset.city} ({preset.audience})
                 </button>
@@ -192,19 +199,20 @@ const AIAdvisoryGenerator = () => {
         </div>
 
         {/* RIGHT DISPLAY (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-xl p-6 border border-stone-200 shadow-xs space-y-4 min-h-[400px] flex flex-col justify-between">
+        <div className="lg:col-span-7 glass-card rounded-2xl p-6 min-h-[500px] flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 -translate-x-1/2" />
           
-          <div>
+          <div className="relative z-10">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-stone-100 pb-3 mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-stone-900 text-amber-500 flex items-center justify-center border border-stone-800">
-                  <Bot size={18} />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-4 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
+                  <Bot size={20} strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-stone-900 text-sm">Generated Advisory Card</h3>
-                  <span className="text-[11px] text-stone-500 flex items-center gap-1">
-                    <CheckCircle2 size={12} className="text-emerald-600" /> Neural Rules Verified
+                  <h3 className="font-light text-white text-lg tracking-wide">Generated Output</h3>
+                  <span className="text-[10px] text-emerald-400/80 flex items-center gap-1.5 uppercase tracking-widest mt-0.5">
+                    <CheckCircle2 size={12} /> Neural Rules Verified
                   </span>
                 </div>
               </div>
@@ -212,27 +220,27 @@ const AIAdvisoryGenerator = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 py-1 px-2.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition border border-stone-200"
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg glass-card hover:bg-white/10 text-white/80 hover:text-white text-[11px] font-medium uppercase tracking-widest transition"
                 >
-                  {copied ? <Check size={13} className="text-emerald-700" /> : <Copy size={13} />}
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} strokeWidth={1.5} />}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
                 <button
                   onClick={() => alert(`Downloading Advisory PDF for ${city}`)}
-                  className="flex items-center gap-1 py-1 px-2.5 rounded bg-stone-900 hover:bg-amber-900 text-white text-xs font-bold transition"
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-[11px] font-medium uppercase tracking-widest transition"
                 >
-                  <Download size={13} /> PDF
+                  <Download size={14} strokeWidth={1.5} /> PDF
                 </button>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-5 rounded-lg bg-stone-50 border border-stone-200/80 whitespace-pre-wrap font-sans text-xs text-stone-800 leading-relaxed">
+            <div className="p-6 rounded-xl glass-input border-white/5 font-mono text-[13px] text-white/90 leading-loose shadow-inner relative z-10 whitespace-pre-wrap">
               {advisoryText}
             </div>
           </div>
 
-          <div className="text-[11px] text-stone-400 text-center pt-2">
+          <div className="text-[10px] text-white/30 text-center pt-4 tracking-widest uppercase font-mono relative z-10">
             Advisory generated for operational municipal dispatch.
           </div>
 
@@ -240,7 +248,7 @@ const AIAdvisoryGenerator = () => {
 
       </div>
 
-    </div>
+    </motion.div>
   );
 };
 

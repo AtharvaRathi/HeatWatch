@@ -1,20 +1,22 @@
 import React from 'react';
 import { SearchX, RefreshCw } from 'lucide-react';
 
-const EmptyState = ({ title = 'No results found', description = 'Try adjusting your search terms or filter criteria.', onReset }) => {
+const EmptyState = ({ onReset }) => {
   return (
-    <div className="bg-white rounded-xl p-10 text-center border border-stone-200 flex flex-col items-center justify-center my-4">
-      <div className="p-3.5 rounded-full bg-stone-100 text-stone-500 mb-3">
-        <SearchX size={30} />
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="p-4 rounded-full bg-white/[0.04] text-white/50 mb-4 border border-white/5 backdrop-blur-md">
+        <SearchX size={32} strokeWidth={1.5} />
       </div>
-      <h3 className="text-sm font-bold text-stone-900 mb-1">{title}</h3>
-      <p className="text-xs text-stone-500 max-w-xs mb-4 leading-relaxed">{description}</p>
+      <h3 className="text-sm font-medium text-white mb-1">No matches found</h3>
+      <p className="text-xs font-light text-white/50 max-w-sm mb-6">
+        We couldn't find any data matching your current filters. Try adjusting your search or clearing the filters.
+      </p>
       {onReset && (
         <button
           onClick={onReset}
-          className="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-stone-900 hover:bg-amber-900 text-white text-xs font-semibold transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-white text-xs font-medium transition border border-white/[0.06]"
         >
-          <RefreshCw size={13} /> Reset Filters
+          <RefreshCw size={14} /> Clear all filters
         </button>
       )}
     </div>

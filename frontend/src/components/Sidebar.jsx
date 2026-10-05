@@ -9,10 +9,10 @@ import {
   Bot, 
   BarChart3, 
   FileText, 
-  Info, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Wind
 } from 'lucide-react';
 
 const navItems = [
@@ -35,49 +35,48 @@ const Sidebar = ({ isCollapsed, toggleSidebar, mobileOpen, closeMobileSidebar })
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div 
-          className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={closeMobileSidebar}
         />
       )}
 
       <aside className={`
-        fixed lg:static top-0 bottom-0 left-0 z-50
+        fixed lg:sticky top-0 h-screen left-0 z-50
         flex flex-col justify-between
-        bg-[#1C1B1A] text-stone-300
-        border-r border-stone-800
-        transition-all duration-300 ease-in-out shadow-lg
-        ${isCollapsed ? 'w-20' : 'w-64'}
+        glass-sidebar
+        transition-all duration-300 ease-in-out
+        ${isCollapsed ? 'w-[80px]' : 'w-[260px]'}
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Top Brand */}
         <div>
-          <div className="flex items-center justify-between h-20 px-5 border-b border-stone-800">
+          <div className="flex items-center justify-between h-20 px-6 border-b border-white/[0.08]">
             <NavLink to="/dashboard" className="flex items-center gap-3 overflow-hidden" onClick={closeMobileSidebar}>
-              <div className="w-9 h-9 rounded-xl bg-stone-900 flex items-center justify-center text-amber-500 border border-stone-800 shrink-0">
-                <Flame size={20} className="text-amber-500" />
+              <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center shrink-0 bg-white/5 backdrop-blur-md">
+                <Wind size={16} strokeWidth={1.5} className="text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
-                  <span className="font-extrabold text-base tracking-tight text-white">
-                    HEATGUARD<span className="text-amber-500 font-medium ml-1">AI</span>
-                  </span>
-                  <span className="text-[10px] text-stone-400 font-mono tracking-wider uppercase">
-                    Heatwave Warning
+                  <span className="font-light text-base tracking-widest text-white">
+                    HeatWatch
                   </span>
                 </div>
               )}
             </NavLink>
             <button 
               onClick={toggleSidebar} 
-              className="hidden lg:flex p-1.5 rounded-lg bg-stone-800 text-stone-400 hover:text-white transition"
+              className="hidden lg:flex p-1.5 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition backdrop-blur-md border border-transparent hover:border-white/10"
               title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
-              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              {isCollapsed ? <ChevronRight size={16} strokeWidth={1.5} /> : <ChevronLeft size={16} strokeWidth={1.5} />}
             </button>
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1 mt-3">
+          <nav className="p-3 space-y-1.5 mt-4">
+            <div className="px-3 pb-2 text-[10px] font-mono tracking-[0.2em] text-white/30 uppercase">
+              {!isCollapsed ? 'Menu' : '•••'}
+            </div>
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -87,21 +86,26 @@ const Sidebar = ({ isCollapsed, toggleSidebar, mobileOpen, closeMobileSidebar })
                   to={item.path}
                   onClick={closeMobileSidebar}
                   className={({ isActive }) => `
-                    flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all group relative
+                    flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-light transition-all group relative
                     ${isActive 
-                      ? 'bg-stone-800 text-amber-400 font-semibold shadow-sm' 
-                      : 'text-stone-400 hover:bg-stone-800/60 hover:text-stone-200'}
+                      ? 'bg-white/[0.08] text-white border border-white/[0.05] shadow-[0_4px_12px_rgba(0,0,0,0.1)]' 
+                      : 'text-white/50 hover:bg-white/[0.04] hover:text-white border border-transparent'}
                   `}
                 >
-                  <Icon size={18} className={`shrink-0 ${isActive ? 'text-amber-400' : 'text-stone-400 group-hover:text-stone-200'}`} />
+                  <Icon size={18} strokeWidth={isActive ? 2 : 1.5} className={`shrink-0 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-white/50 group-hover:text-white'}`} />
                   
                   {!isCollapsed && (
-                    <span className="truncate">{item.name}</span>
+                    <span className="truncate tracking-wide">{item.name}</span>
+                  )}
+
+                  {/* Active indicator dot */}
+                  {isActive && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                   )}
 
                   {/* Tooltip for Collapsed view */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-3 px-3 py-1.5 bg-stone-900 text-stone-200 text-xs font-semibold rounded-md shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition z-50 border border-stone-800">
+                    <div className="absolute left-full ml-4 px-3 py-1.5 glass-card text-white text-xs font-light tracking-wide rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition z-50">
                       {item.name}
                     </div>
                   )}
@@ -113,12 +117,14 @@ const Sidebar = ({ isCollapsed, toggleSidebar, mobileOpen, closeMobileSidebar })
 
         {/* Footer Minimal Indicator */}
         {!isCollapsed && (
-          <div className="p-4 m-3 rounded-xl bg-stone-900/80 border border-stone-800 text-xs space-y-1">
-            <div className="flex items-center gap-2 text-stone-200 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>IMD Data Sync Active</span>
+          <div className="p-4 m-4 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-md">
+            <div className="flex items-center gap-3 text-white/80 font-light text-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
+              </span>
+              <span className="tracking-wide">System Online</span>
             </div>
-            <p className="text-[11px] text-stone-500">72h predictive ML engine online.</p>
           </div>
         )}
       </aside>
