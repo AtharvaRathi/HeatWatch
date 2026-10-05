@@ -6,15 +6,21 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
+// Microservice-specific Base URLs (if deployed independently)
+const WEATHER_API_URL = import.meta.env.VITE_WEATHER_API_URL || API_BASE_URL;
+const ALERT_API_URL = import.meta.env.VITE_ALERT_API_URL || API_BASE_URL;
+const ADVISORY_API_URL = import.meta.env.VITE_ADVISORY_API_URL || API_BASE_URL;
+const ANALYTICS_API_URL = import.meta.env.VITE_ANALYTICS_API_URL || API_BASE_URL;
+
 /**
  * Generic fetch wrapper with error handling and timeout
  */
-async function fetchAPI(endpoint, options = {}) {
+async function fetchAPI(baseUrl, endpoint, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       ...options,
       signal: controller.signal,
       headers: {
@@ -42,15 +48,15 @@ async function fetchAPI(endpoint, options = {}) {
 // ============================================
 
 export async function fetchCitiesWeather() {
-  return await fetchAPI('/api/weather/cities');
+  return await fetchAPI(WEATHER_API_URL, '/api/weather/cities');
 }
 
 export async function fetchCityWeather(cityId) {
-  return await fetchAPI(`/api/weather/cities/${cityId}`);
+  return await fetchAPI(WEATHER_API_URL, `/api/weather/cities/${cityId}`);
 }
 
 export async function fetchWeeklyForecast() {
-  return await fetchAPI('/api/weather/forecast');
+  return await fetchAPI(WEATHER_API_URL, '/api/weather/forecast');
 }
 
 // ============================================
@@ -62,15 +68,15 @@ export async function fetchAlerts(severity = null, search = null) {
   if (severity) params.append('severity', severity);
   if (search) params.append('search', search);
   const queryString = params.toString();
-  return await fetchAPI(`/api/alerts${queryString ? '?' + queryString : ''}`);
+  return await fetchAPI(ALERT_API_URL, `/api/alerts${queryString ? '?' + queryString : ''}`);
 }
 
 export async function fetchAlertById(alertId) {
-  return await fetchAPI(`/api/alerts/${alertId}`);
+  return await fetchAPI(ALERT_API_URL, `/api/alerts/${alertId}`);
 }
 
 export async function fetchAlertsBySeverity(level) {
-  return await fetchAPI(`/api/alerts/severity/${level}`);
+  return await fetchAPI(ALERT_API_URL, `/api/alerts/severity/${level}`);
 }
 
 // ============================================
@@ -82,14 +88,14 @@ export async function fetchAdvisoryPresets(audience = null, city = null) {
   if (audience) params.append('audience', audience);
   if (city) params.append('city', city);
   const queryString = params.toString();
-  return await fetchAPI(`/api/advisory/presets${queryString ? '?' + queryString : ''}`);
+  return await fetchAPI(ADVISORY_API_URL, `/api/advisory/presets${queryString ? '?' + queryString : ''}`);
 }
 
 export async function generateAdvisory(city, audience, temp, severity) {
   const params = new URLSearchParams({ city, audience });
   if (temp) params.append('temp', temp);
   if (severity) params.append('severity', severity);
-  return await fetchAPI(`/api/advisory/generate?${params.toString()}`);
+  return await fetchAPI(ADVISORY_API_URL, `/api/advisory/generate?${params.toString()}`);
 }
 
 // ============================================
@@ -97,22 +103,22 @@ export async function generateAdvisory(city, audience, temp, severity) {
 // ============================================
 
 export async function fetchDashboardStats() {
-  return await fetchAPI('/api/analytics/dashboard');
+  return await fetchAPI(ANALYTICS_API_URL, '/api/analytics/dashboard');
 }
 
 export async function fetchAnalyticsTrends() {
-  return await fetchAPI('/api/analytics/trends');
+  return await fetchAPI(ANALYTICS_API_URL, '/api/analytics/trends');
 }
 
 export async function fetchReports(type = null) {
   const params = new URLSearchParams();
   if (type) params.append('type', type);
   const queryString = params.toString();
-  return await fetchAPI(`/api/analytics/reports${queryString ? '?' + queryString : ''}`);
+  return await fetchAPI(ANALYTICS_API_URL, `/api/analytics/reports${queryString ? '?' + queryString : ''}`);
 }
 
 export async function fetchMapData() {
-  return await fetchAPI('/api/analytics/map-data');
+  return await fetchAPI(ANALYTICS_API_URL, '/api/analytics/map-data');
 }
 
 // ============================================
@@ -120,14 +126,15 @@ export async function fetchMapData() {
 // ============================================
 
 export async function checkServiceHealth(service) {
-  const endpoints = {
-    weather: '/api/weather/health',
-    alerts: '/api/alerts/health',
-    advisory: '/api/advisory/health',
-    analytics: '/api/analytics/health',
-    gateway: '/gateway/health',
+  const endpointObj = {
+    weather: { url: WEATHER_API_URL, path: '/api/weather/health' },
+    alerts: { url: ALERT_API_URL, path: '/api/alerts/health' },
+    advisory: { url: ADVISORY_API_URL, path: '/api/advisory/health' },
+    analytics: { url: ANALYTICS_API_URL, path: '/api/analytics/health' },
+    gateway: { url: API_BASE_URL, path: '/gateway/health' },
   };
-  return await fetchAPI(endpoints[service] || endpoints.gateway);
+  const target = endpointObj[service] || endpointObj.gateway;
+  return await fetchAPI(target.url, target.path);
 }
 
 export async function checkAllServicesHealth() {
