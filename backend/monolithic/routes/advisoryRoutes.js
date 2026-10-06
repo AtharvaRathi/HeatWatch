@@ -21,13 +21,45 @@ router.get('/generate', async (req, res) => {
   try {
     const { city, audience, temp, severity } = req.query;
     if (!city || !audience) return res.status(400).json({ error: 'City and audience parameters are required' });
-    const templates = {
-      Citizen: `🔥 CRITICAL CITIZEN ADVISORY - ${(city || '').toUpperCase()} REGION\n\n• Exposure Hazard: Avoid non-essential outdoor movements between 11:30 AM and 4:30 PM.\n• Hydration Strategy: Drink minimum 3.5 - 4 Liters of water daily.\n• First Aid Notice: If experiencing dizziness, seek immediate shade and call 108.`,
-      Farmer: `🌾 AGRICULTURAL HEAT ADVISORY - ${(city || '').toUpperCase()}\n\n• Crop Protection: Conduct light micro-irrigation only during early morning (5 AM - 7 AM).\n• Livestock Care: Ensure cattle sheds are covered with thatch or wet gunny bags.\n• Field Work Timings: Shift all manual labor to before 10:30 AM.`,
-      Hospital: `🏥 HEALTHCARE EMERGENCY PREPAREDNESS ADVISORY\n\n• Ward Readiness: Reserve 15% bed capacity for Heat Stroke cases.\n• Resource Supply: Ensure 100% stock of IV saline fluids, ORS packs, cooling blankets.\n• Triage Protocol: Fast-track patients with body temp > 103°F.`,
-      Municipality: `🏙️ MUNICIPAL ACTION PLAN - ${(city || '').toUpperCase()}\n\n• Activate public misting stations at bus stands and railway hubs.\n• Deploy mobile water tankers to vulnerable colonies.\n• Enforce mandatory 2-hour rest for construction workers 1-3 PM.`
-    };
-    res.json({ city, temp: temp || 'N/A', severity: severity || 'Moderate', audience, text: templates[audience] || templates['Citizen'], generatedAt: new Date().toISOString(), model: 'HeatwaveAdvisory-LSTM-v3.4' });
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    
+    let advisoryText = '';
+
+    if (!GROQ_API_KEY) {
+      advisoryText = `[Simulated Fallback - Please configure GROQ_API_KEY in Render]\n\nHeatwave advisory for ${audience} in ${city} (Temp: ${temp || 'N/A'}, Severity: ${severity || 'Moderate'}). Stay hydrated and avoid direct sunlight.`;
+    } else {
+      const prompt = `You are "HeatWatch AI", an advanced climate resilience intelligence system. 
+Generate a real-time, highly customized heatwave advisory for the '${audience}' sector in '${city}'. 
+Current Telemetry: Temperature is ${temp || 'N/A'}°C, Severity Level is ${severity || 'Moderate'}.
+
+Format your response exactly like this:
+[HEATWATCH AI REAL-TIME ANALYSIS]
+(Provide 1 brief, highly intelligent sentence analyzing the specific danger of ${temp}°C for the geography of ${city}).
+
+[TARGETED ACTION PROTOCOLS]
+(Provide 3 highly specific, actionable, and scientific protocols tailored exactly to the ${audience} sector to mitigate ${severity} risk at ${temp}°C).
+
+Always conclude exactly with: "/// Generated in real-time by HeatWatch AI / Model: Llama-3 ///". Keep the total response under 150 words.`;
+      
+      const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama3-8b-8192',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.5,
+          max_tokens: 250
+        })
+      });
+
+      if (!groqResponse.ok) throw new Error('Groq API request failed');
+      const groqData = await groqResponse.json();
+      advisoryText = groqData.choices[0].message.content;
+    }
+    res.json({ city, temp: temp || 'N/A', severity: severity || 'Moderate', audience, text: advisoryText, generatedAt: new Date().toISOString(), model: 'Groq-Llama-3-8B' });
   } catch (err) { res.status(500).json({ error: 'Failed to generate advisory' }); }
 });
 
