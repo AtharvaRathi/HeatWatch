@@ -322,14 +322,14 @@ const Dashboard = () => {
           <div>
             <h2 className="text-lg font-light text-white mb-6 border-b border-white/10 pb-4">Recent System Log</h2>
             <div className="space-y-4">
-              {[].map((act) => (
-                <div key={act.id} className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+              {alerts && alerts.slice(0, 5).map((act) => (
+                <div key={act.id || act.alertId || Math.random()} className="flex items-start gap-3">
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${act.code === 'red' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : act.code === 'orange' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`} />
                   <div className="flex-1 pb-3 border-b border-white/5 last:border-0">
                     <h4 className="font-light text-[13px] text-white/90">{act.title}</h4>
-                    <p className="text-[11px] font-light text-white/50 mt-0.5">{act.target}</p>
+                    <p className="text-[11px] font-light text-white/50 mt-0.5">{act.city}, {act.state}</p>
                     <span className="text-[9px] tracking-widest text-white/30 font-mono block mt-1.5 uppercase">
-                      {act.time}
+                      {act.timestamp}
                     </span>
                   </div>
                 </div>

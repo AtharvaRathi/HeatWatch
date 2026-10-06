@@ -199,10 +199,10 @@ const Reports = () => {
               <div className="p-6 glass-input rounded-2xl border border-white/5 space-y-5 text-sm font-light leading-relaxed text-white/80 shadow-inner">
                 <h4 className="font-medium text-white text-[11px] uppercase tracking-widest border-b border-white/10 pb-3">Summary</h4>
                 <p>
-                  During <strong className="text-amber-400 font-normal">{selectedReportPreview.date}</strong>, thermal sensors recorded maximum temperature peaks reaching 46.2°C in Phalodi, Rajasthan, with Vidarbha registering 3 consecutive severe heatwave days.
+                  This official <strong>{selectedReportPreview.type}</strong> report ({selectedReportPreview.period} period) analyzes critical climate data compiled for the period ending <strong>{selectedReportPreview.date}</strong>. During this cycle, extensive thermal telemetry was collected and aggregated across monitoring stations nationwide.
                 </p>
                 <p>
-                  Ground station validation confirmed AI model accuracy at 95.4%. Public safety advisories were dispatched to 14 municipal bodies.
+                  Ground station validation confirmed the AI predictive models maintained a robust accuracy rating. Automated hazard protocols and real-time public safety advisories were successfully dispatched to municipal databases according to verified extreme heat algorithms.
                 </p>
                 <div className="p-4 bg-white/5 rounded-xl border border-white/5 font-mono text-[11px] text-white/50 flex items-center justify-between mt-4 tracking-wider">
                   <span>Size: {selectedReportPreview.size}</span>

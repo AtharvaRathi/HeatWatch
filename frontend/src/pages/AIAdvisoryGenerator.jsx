@@ -33,24 +33,23 @@ const AIAdvisoryGenerator = () => {
     });
   }, []);
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e?.preventDefault();
     setIsGenerating(true);
-
-    setTimeout(() => {
-      const preset = presets.find(p => p.audience === audience);
-      if (preset) {
-        setAdvisoryText(preset.text.replace('NAGPUR', city.toUpperCase()).replace('45.2°C', temp));
+    
+    try {
+      const { generateAdvisory } = await import('../services/api');
+      const res = await generateAdvisory(city, audience, temp, severity);
+      if (res && res.text) {
+        setAdvisoryText(res.text);
       } else {
-        setAdvisoryText(`🔥 AI PUBLIC SAFETY ADVISORY - ${city.toUpperCase()} (${temp})
-        
-• Target Group: ${audience}
-• Warning Level: ${severity}
-• Key Protocol: Enforce mandatory rest intervals between 12 PM - 4 PM. Keep hydration centers active across high-density hubs.
-• Medical Emergency: Keep IV cooling fluids ready and dial 108 for emergency transport.`);
+        setAdvisoryText(`[Error] The AI model failed to generate a response. Please ensure GROQ_API_KEY is configured in the backend.`);
       }
+    } catch (err) {
+      setAdvisoryText(`[Error] Failed to connect to the AI microservice.`);
+    } finally {
       setIsGenerating(false);
-    }, 600);
+    }
   };
 
   const handlePresetSelect = (preset) => {
