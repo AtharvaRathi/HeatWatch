@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import SearchModal from './SearchModal';
-import LocomotiveScroll from 'locomotive-scroll';
-import 'locomotive-scroll/dist/locomotive-scroll.css';
+
 
 const Layout = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -21,12 +20,7 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    const locomotiveScroll = new LocomotiveScroll();
-    return () => {
-      locomotiveScroll.destroy();
-    };
-  }, []);
+
 
   return (
     <>
