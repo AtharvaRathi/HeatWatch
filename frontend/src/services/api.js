@@ -51,6 +51,13 @@ export async function fetchCitiesWeather() {
   return await fetchAPI(WEATHER_API_URL, '/api/weather/cities');
 }
 
+export async function searchCityWeather(city) {
+  return await fetchAPI(WEATHER_API_URL, '/api/weather/search', {
+    method: 'POST',
+    body: JSON.stringify({ city })
+  });
+}
+
 export async function fetchCityWeather(cityId) {
   return await fetchAPI(WEATHER_API_URL, `/api/weather/cities/${cityId}`);
 }

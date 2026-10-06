@@ -14,12 +14,11 @@ import {
   ChevronRight,
   CloudSun
 } from 'lucide-react';
-import { mockCitiesWeather } from '../data/mockData';
 import EmptyState from '../components/EmptyState';
 import { motion } from 'framer-motion';
 
 const WeatherMonitoring = () => {
-  const [citiesData, setCitiesData] = useState(mockCitiesWeather);
+  const [citiesData, setCitiesData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('All');
   const [selectedState, setSelectedState] = useState('All');
@@ -145,15 +144,33 @@ const WeatherMonitoring = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           
           {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-3 text-white/40" size={16} strokeWidth={1.5} />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              placeholder="Search city or state..."
-              className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm font-light text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-            />
+          <div className="relative col-span-1 md:col-span-1">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!searchTerm) return;
+              try {
+                const newCity = await import('../services/api').then(m => m.searchCityWeather(searchTerm));
+                if (newCity && !newCity.error) {
+                  // Re-fetch all cities so the table updates
+                  const res = await fetchCitiesWeather();
+                  if (res) setCitiesData(res);
+                  setSearchTerm('');
+                } else {
+                  alert('City not found or error fetching live data.');
+                }
+              } catch (err) {
+                alert('Error searching for city live data.');
+              }
+            }}>
+              <Search className="absolute left-3.5 top-3 text-white/40" size={16} strokeWidth={1.5} />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search ANY city & press Enter..."
+                className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm font-light text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+              />
+            </form>
           </div>
 
           {/* Region */}

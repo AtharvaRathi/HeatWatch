@@ -49,7 +49,18 @@ router.get('/generate', async (req, res) => {
       advisoryText = `[Simulated Fallback - Please configure GROQ_API_KEY]\n\nHeatwave advisory for ${audience} in ${city} (Temp: ${temp || 'N/A'}, Severity: ${severity || 'Moderate'}). Stay hydrated and avoid direct sunlight.`;
     } else {
       // Call Groq API
-      const prompt = `You are a climate crisis expert. Generate a concise, 3-bullet-point heatwave advisory for a ${audience} in ${city}. The current temperature is ${temp || 'N/A'}°C and the severity is ${severity || 'Moderate'}. Do not include pleasantries, just output the actionable advice.`;
+      const prompt = `You are "HeatWatch AI", an advanced climate resilience intelligence system. 
+Generate a real-time, highly customized heatwave advisory for the '${audience}' sector in '${city}'. 
+Current Telemetry: Temperature is ${temp || 'N/A'}°C, Severity Level is ${severity || 'Moderate'}.
+
+Format your response exactly like this:
+[HEATWATCH AI REAL-TIME ANALYSIS]
+(Provide 1 brief, highly intelligent sentence analyzing the specific danger of ${temp}°C for the geography of ${city}).
+
+[TARGETED ACTION PROTOCOLS]
+(Provide 3 highly specific, actionable, and scientific protocols tailored exactly to the ${audience} sector to mitigate ${severity} risk at ${temp}°C).
+
+Always conclude exactly with: "/// Generated in real-time by HeatWatch AI / Model: Llama-3 ///". Keep the total response under 150 words.`;
       
       const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
