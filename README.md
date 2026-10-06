@@ -14,6 +14,7 @@
 
 ## Table of Contents
 
+- [Live Demos](#-live-demos)
 - [Architecture Overview](#-architecture-overview)
 - [3-Tier Architecture](#-3-tier-architecture)
 - [Microservices vs Monolithic](#-microservices-vs-monolithic)
@@ -24,6 +25,14 @@
 - [API Endpoints](#-api-endpoints)
 - [CI/CD Pipeline](#-cicd-pipeline)
 - [Key Features](#-key-features)
+
+---
+
+## Live Demos
+
+- **Frontend (Vercel):** [https://heat-watch-final.vercel.app/](https://heat-watch-final.vercel.app/) *(Check your Vercel for the exact URL)*
+- **Backend (Render - Monolith):** [https://heatwatchmain.onrender.com/](https://heatwatchmain.onrender.com/)
+- **Backend (Render - Advisory Microservice):** [https://heatwatch-advisory-service.onrender.com/](https://heatwatch-advisory-service.onrender.com/)
 
 ---
 
