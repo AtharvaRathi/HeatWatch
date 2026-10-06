@@ -35,6 +35,31 @@ const itemVariants = {
 
 const Analytics = () => {
   const [timeframe, setTimeframe] = useState('30D');
+  const [analyticsData, setAnalyticsData] = useState({
+    tempTrend7Days: [],
+    regionComparison: [],
+    monthlyHeatwaveCounts: [],
+    severityDistribution: [],
+    predictionAccuracyHistory: [],
+    forecastConfidenceByRegion: []
+  });
+
+  React.useEffect(() => {
+    import('../services/api').then(({ fetchAnalyticsTrends }) => {
+      fetchAnalyticsTrends().then(res => {
+        if (res) {
+          setAnalyticsData({
+            tempTrend7Days: res.tempTrend7Days || [],
+            regionComparison: res.regionComparison || [],
+            monthlyHeatwaveCounts: res.monthlyHeatwaveCounts || [],
+            severityDistribution: res.severityDistribution || [],
+            predictionAccuracyHistory: res.predictionAccuracyHistory || [],
+            forecastConfidenceByRegion: res.forecastConfidenceByRegion || []
+          });
+        }
+      });
+    });
+  }, []);
 
   return (
     <motion.div 
@@ -83,7 +108,7 @@ const Analytics = () => {
             subtitle="7-day peak temperature progression across observation stations."
           >
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={mockAnalyticsData.tempTrend7Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={analyticsData.tempTrend7Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="date" stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dy={10} />
                 <YAxis domain={[35, 48]} stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dx={-10} unit="°" />
@@ -106,7 +131,7 @@ const Analytics = () => {
             subtitle="Comparing average vs maximum recorded temperatures by region."
           >
             <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={mockAnalyticsData.regionComparison} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={analyticsData.regionComparison} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="region" stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dy={10} />
                 <YAxis domain={[30, 50]} stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dx={-10} unit="°" />
@@ -133,7 +158,7 @@ const Analytics = () => {
             subtitle="Accumulated total heatwave alerts vs severe alerts."
           >
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={mockAnalyticsData.monthlyHeatwaveCounts} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={analyticsData.monthlyHeatwaveCounts} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorAlerts" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
@@ -166,7 +191,7 @@ const Analytics = () => {
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie
-                  data={mockAnalyticsData.severityDistribution}
+                  data={analyticsData.severityDistribution}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -175,7 +200,7 @@ const Analytics = () => {
                   dataKey="value"
                   stroke="rgba(0,0,0,0)"
                 >
-                  {mockAnalyticsData.severityDistribution.map((entry, index) => (
+                  {analyticsData.severityDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={
                       entry.name === 'Red (Severe)' ? '#f43f5e' :
                       entry.name === 'Orange (Heatwave)' ? '#f59e0b' :
@@ -205,7 +230,7 @@ const Analytics = () => {
             subtitle="Ground station actuals vs AI model predicted curves."
           >
             <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={mockAnalyticsData.predictionAccuracyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={analyticsData.predictionAccuracyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="week" stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dy={10} />
                 <YAxis domain={[38, 48]} stroke="#ffffff" opacity={0.4} fontSize={10} tickLine={false} axisLine={false} dx={-10} unit="°" />
@@ -226,7 +251,7 @@ const Analytics = () => {
             subtitle="Model reliability calculated per station cluster."
           >
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={mockAnalyticsData.forecastConfidenceByRegion} layout="vertical" margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+              <BarChart data={analyticsData.forecastConfidenceByRegion} layout="vertical" margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={true} vertical={false} />
                 <XAxis type="number" domain={[80, 100]} stroke="#ffffff" opacity={0.4} fontSize={10} unit="%" tickLine={false} axisLine={false} />
                 <YAxis dataKey="region" type="category" stroke="#ffffff" opacity={0.4} fontSize={10} width={80} tickLine={false} axisLine={false} />

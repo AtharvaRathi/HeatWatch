@@ -30,7 +30,7 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
 
           {/* List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
-            {mockRecentActivities.map((act) => (
+            {[].map((act) => (
               <div key={act.id} className="p-3.5 rounded-xl glass-card hover:bg-white/[0.04] transition">
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-lg shrink-0 ${

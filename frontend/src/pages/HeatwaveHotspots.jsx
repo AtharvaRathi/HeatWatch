@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Flame, Search, RefreshCw } from 'lucide-react';
 import HotspotCard from '../components/HotspotCard';
 import EmptyState from '../components/EmptyState';
+import { fetchCitiesWeather } from '../services/api';
 import { motion } from 'framer-motion';
 
 const containerVariants = {
@@ -18,10 +19,19 @@ const HeatwaveHotspots = () => {
   const [selectedState, setSelectedState] = useState('All');
   const [sortBy, setSortBy] = useState('riskScore');
 
-  const states = useMemo(() => ['All', ...new Set(mockHotspots.map(h => h.state))], []);
+  useEffect(() => {
+    fetchCitiesWeather().then(res => {
+      if (res) {
+        const sorted = res.map((r, i) => ({ ...r, riskColor: r.statusColor })).sort((a, b) => b.riskScore - a.riskScore);
+        setHotspotsData(sorted);
+      }
+    });
+  }, []);
+
+  const states = useMemo(() => ['All', ...new Set(hotspotsData.map(h => h.state))], [hotspotsData]);
 
   const filteredHotspots = useMemo(() => {
-    return mockHotspots
+    return hotspotsData
       .filter(item => {
         const matchesSearch = item.city.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               item.state.toLowerCase().includes(searchTerm.toLowerCase());

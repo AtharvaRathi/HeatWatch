@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Download, Eye, Search, X } from 'lucide-react';
 import ReportCard from '../components/ReportCard';
+import { fetchReports } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const containerVariants = {
@@ -21,7 +22,11 @@ const Reports = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('All');
 
-  const filteredHistory = mockReportsList.filter(rep => {
+  useEffect(() => {
+    fetchReports().then(res => setReportsData(res || []));
+  }, []);
+
+  const filteredHistory = reportsData.filter(rep => {
     const matchesSearch = rep.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           rep.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'All' || rep.type === selectedType;
@@ -60,7 +65,7 @@ const Reports = () => {
           animate="show"
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          {mockReportsList.slice(0, 3).map((report) => (
+          {reportsData.slice(0, 3).map((report) => (
             <motion.div variants={itemVariants} key={report.id}>
               <ReportCard 
                 report={report} 

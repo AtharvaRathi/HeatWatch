@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import IndiaMap from '../components/IndiaMap';
 import { MapPin, Thermometer, Flame, Info, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { fetchMapData } from '../services/api';
 
 const InteractiveHeatMap = () => {
-  const [selectedState, setSelectedState] = useState(mockIndiaStatesMapData[0]);
+  const [mapData, setMapData] = useState([]);
+  const [selectedState, setSelectedState] = useState(null);
+
+  useEffect(() => {
+    fetchMapData().then(res => {
+      setMapData(res || []);
+      if (res && res.length > 0) setSelectedState(res[0]);
+    });
+  }, []);
 
   return (
     <motion.div 
@@ -38,13 +47,16 @@ const InteractiveHeatMap = () => {
            <IndiaMap 
             selectedStateId={selectedState?.id}
             onSelectState={(st) => setSelectedState(st)}
+            mapData={mapData}
           />
         </div>
 
         {/* State Side Panel (1 Col) */}
         <div className="glass-card rounded-2xl p-6 space-y-6">
           
-          {/* Header */}
+          {selectedState ? (
+            <>
+              {/* Header */}
           <div className="flex justify-between items-start border-b border-white/10 pb-5">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -125,6 +137,10 @@ const InteractiveHeatMap = () => {
           >
             Generate Advisory <ChevronRight size={16} strokeWidth={1.5} />
           </Link>
+            </>
+          ) : (
+            <div className="text-white/50 text-center py-20">Loading state data...</div>
+          )}
 
         </div>
 

@@ -12,7 +12,7 @@ import {
   RefreshCw,
   CheckCircle2
 } from 'lucide-react';
-import { mockAIAdvisoryPresets } from '../data/mockData';
+import { fetchAdvisoryPresets } from '../services/api';
 import { motion } from 'framer-motion';
 
 const AIAdvisoryGenerator = () => {
@@ -23,14 +23,22 @@ const AIAdvisoryGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const [advisoryText, setAdvisoryText] = useState(mockAIAdvisoryPresets[0].text);
+  const [presets, setPresets] = useState([]);
+  const [advisoryText, setAdvisoryText] = useState('');
+
+  React.useEffect(() => {
+    fetchAdvisoryPresets().then(res => {
+      setPresets(res || []);
+      if (res && res.length > 0) setAdvisoryText(res[0].text);
+    });
+  }, []);
 
   const handleGenerate = (e) => {
     e?.preventDefault();
     setIsGenerating(true);
 
     setTimeout(() => {
-      const preset = mockAIAdvisoryPresets.find(p => p.audience === audience);
+      const preset = presets.find(p => p.audience === audience);
       if (preset) {
         setAdvisoryText(preset.text.replace('NAGPUR', city.toUpperCase()).replace('45.2°C', temp));
       } else {
@@ -184,7 +192,7 @@ const AIAdvisoryGenerator = () => {
           <div className="pt-4 border-t border-white/10 mt-6">
             <span className="text-[10px] font-medium uppercase tracking-widest text-white/30 block mb-3">Quick Prompts</span>
             <div className="flex flex-wrap gap-2">
-              {mockAIAdvisoryPresets.map((preset, i) => (
+              {presets.map((preset, i) => (
                 <button
                   key={i}
                   onClick={() => handlePresetSelect(preset)}

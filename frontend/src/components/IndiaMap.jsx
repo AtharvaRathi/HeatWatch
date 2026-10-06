@@ -21,7 +21,7 @@ const stateNameMap = {
   "West Bengal": "WB"
 };
 
-const IndiaMap = ({ onSelectState, selectedStateId }) => {
+const IndiaMap = ({ onSelectState, selectedStateId, mapData = [] }) => {
   const [hoveredState, setHoveredState] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [position, setPosition] = useState({ coordinates: [80, 22], zoom: 1 });
@@ -40,14 +40,16 @@ const IndiaMap = ({ onSelectState, selectedStateId }) => {
   const handleZoomOut = () => setZoomLevel(prev => Math.max(prev / 1.5, 1));
   const handleResetZoom = () => setZoomLevel(1);
 
-  // Map our mock data to a fast lookup dictionary
+  // Map our data to a fast lookup dictionary
   const stateDataMap = useMemo(() => {
     const map = {};
-    mockIndiaStatesMapData.forEach(st => {
-      map[st.id] = st;
-    });
+    if (Array.isArray(mapData)) {
+      mapData.forEach(st => {
+        map[st.id] = st;
+      });
+    }
     return map;
-  }, []);
+  }, [mapData]);
 
   return (
     <div className="relative w-full h-[600px] bg-[#121214] rounded-2xl p-4 overflow-hidden border border-white/[0.05] shadow-2xl flex flex-col justify-between">

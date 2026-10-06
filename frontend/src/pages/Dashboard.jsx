@@ -12,9 +12,7 @@ import {
   mockDashboardStats, 
   mockWeeklyForecast, 
   mockRecentActivities, 
-  mockHotspots, 
-  mockAlerts, 
-  mockAnalyticsData 
+  // mockRecentActivities was removed
 } from '../data/mockData';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Link } from 'react-router-dom';
@@ -324,7 +322,7 @@ const Dashboard = () => {
           <div>
             <h2 className="text-lg font-light text-white mb-6 border-b border-white/10 pb-4">Recent System Log</h2>
             <div className="space-y-4">
-              {mockRecentActivities.slice(0, 4).map((act) => (
+              {[].map((act) => (
                 <div key={act.id} className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
                   <div className="flex-1 pb-3 border-b border-white/5 last:border-0">
