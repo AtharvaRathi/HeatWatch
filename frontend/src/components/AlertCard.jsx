@@ -92,7 +92,7 @@ const AlertCard = ({ alert }) => {
           <span>Issued: {alert.timestamp}</span>
         </div>
         <button 
-          onClick={() => alert(`Exporting advisory PDF for ${alert.city}`)}
+          onClick={() => window.print()}
           className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition uppercase tracking-widest font-medium text-[10px]"
         >
           <Download size={14} strokeWidth={1.5} /> PDF

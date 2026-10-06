@@ -76,7 +76,7 @@ const WeatherMonitoring = () => {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setSearchTerm('');
     setSelectedRegion('All');
     setSelectedState('All');
@@ -84,6 +84,12 @@ const WeatherMonitoring = () => {
     setSortField('temp');
     setSortDirection('desc');
     setCurrentPage(1);
+    try {
+      const res = await fetchCitiesWeather();
+      if (res) setCitiesData(res);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const getStatusBadge = (color) => {

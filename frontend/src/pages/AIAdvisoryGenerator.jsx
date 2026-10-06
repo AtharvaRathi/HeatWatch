@@ -226,7 +226,7 @@ const AIAdvisoryGenerator = () => {
                   {copied ? 'Copied' : 'Copy'}
                 </button>
                 <button
-                  onClick={() => alert(`Downloading Advisory PDF for ${city}`)}
+                  onClick={() => window.print()}
                   className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-[11px] font-medium uppercase tracking-widest transition"
                 >
                   <Download size={14} strokeWidth={1.5} /> PDF

@@ -42,13 +42,13 @@ const ReportCard = ({ report, onPreview }) => {
           <Eye size={14} strokeWidth={1.5} /> Preview
         </button>
         <button
-          onClick={() => alert(`Downloading PDF report: ${report.title}`)}
+          onClick={() => window.print()}
           className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-[10px] font-medium uppercase tracking-widest transition border border-amber-500/30"
         >
           <Download size={14} strokeWidth={1.5} /> PDF
         </button>
         <button
-          onClick={() => alert(`Exporting CSV dataset for ${report.title}`)}
+          onClick={() => window.print()}
           className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl glass-card hover:bg-white/10 text-white/60 hover:text-white text-[10px] font-medium uppercase tracking-widest transition border border-white/5 hover:border-white/10"
         >
           CSV

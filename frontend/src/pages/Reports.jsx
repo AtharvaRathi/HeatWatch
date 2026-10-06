@@ -144,7 +144,7 @@ const Reports = () => {
                         <Eye size={16} strokeWidth={1.5} />
                       </button>
                       <button
-                        onClick={() => alert(`Downloading PDF: ${rep.title}`)}
+                        onClick={() => window.print()}
                         className="p-2 rounded-xl glass-card hover:bg-amber-500/20 text-amber-400 transition border border-amber-500/30"
                         title="Download PDF"
                       >
@@ -213,7 +213,7 @@ const Reports = () => {
                   Close
                 </button>
                 <button
-                  onClick={() => alert(`Downloading ${selectedReportPreview.title}`)}
+                  onClick={() => window.print()}
                   className="py-3 px-6 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-medium uppercase tracking-widest transition flex items-center gap-2 shadow-[0_0_15px_-3px_rgba(245,158,11,0.4)] border border-amber-500/30"
                 >
                   <Download size={16} strokeWidth={1.5} /> Download PDF
