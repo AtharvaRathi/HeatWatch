@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
-import { mockIndiaStatesMapData } from '../data/mockData';
 import { Flame, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 
 const INDIA_GEOJSON_URL = '/india-topo.json';

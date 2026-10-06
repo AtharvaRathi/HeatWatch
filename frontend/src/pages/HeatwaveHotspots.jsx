@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Flame, Search, RefreshCw } from 'lucide-react';
-import { mockHotspots } from '../data/mockData';
 import HotspotCard from '../components/HotspotCard';
 import EmptyState from '../components/EmptyState';
 import { motion } from 'framer-motion';

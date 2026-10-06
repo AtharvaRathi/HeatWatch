@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import IndiaMap from '../components/IndiaMap';
-import { mockIndiaStatesMapData } from '../data/mockData';
 import { MapPin, Thermometer, Flame, Info, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';

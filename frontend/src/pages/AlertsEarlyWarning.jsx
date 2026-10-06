@@ -5,7 +5,6 @@ import {
   LayoutGrid, 
   ListOrdered
 } from 'lucide-react';
-import { mockAlerts } from '../data/mockData';
 import { fetchAlerts as fetchAlertsAPI } from '../services/api';
 import AlertCard from '../components/AlertCard';
 import EmptyState from '../components/EmptyState';
@@ -13,7 +12,7 @@ import { filterAlerts } from '../utils/alertFilters';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AlertsEarlyWarning = () => {
-  const [alertsData, setAlertsData] = useState(mockAlerts);
+  const [alertsData, setAlertsData] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');

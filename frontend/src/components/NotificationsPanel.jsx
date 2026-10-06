@@ -1,6 +1,5 @@
 import React from 'react';
 import { X, Bell, AlertTriangle, Flame, CheckCircle2, Clock } from 'lucide-react';
-import { mockRecentActivities } from '../data/mockData';
 
 const NotificationsPanel = ({ isOpen, onClose }) => {
   if (!isOpen) return null;

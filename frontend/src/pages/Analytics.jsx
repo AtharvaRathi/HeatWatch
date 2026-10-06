@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart3 } from 'lucide-react';
 import ChartCard from '../components/ChartCard';
-import { mockAnalyticsData } from '../data/mockData';
 import { motion } from 'framer-motion';
 import { 
   ResponsiveContainer, 

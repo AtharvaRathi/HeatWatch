@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FileText, Download, Eye, Search, X } from 'lucide-react';
-import { mockReportsList } from '../data/mockData';
 import ReportCard from '../components/ReportCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
