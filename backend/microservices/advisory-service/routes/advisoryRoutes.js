@@ -31,7 +31,7 @@ router.get('/presets', async (req, res) => {
   }
 });
 
-// GET /api/advisory/generate - Simulated AI advisory generation
+// GET /api/advisory/generate - Real AI advisory generation using Groq API
 router.get('/generate', async (req, res) => {
   try {
     const { city, audience, temp, severity } = req.query;
@@ -40,15 +40,38 @@ router.get('/generate', async (req, res) => {
       return res.status(400).json({ error: 'City and audience parameters are required' });
     }
 
-    // Simulate AI generation with template-based response
-    const templates = {
-      Citizen: `🔥 CRITICAL CITIZEN ADVISORY - ${(city || '').toUpperCase()} REGION\n\n• Exposure Hazard: Avoid non-essential outdoor movements between 11:30 AM and 4:30 PM.\n• Hydration Strategy: Drink minimum 3.5 - 4 Liters of water daily, supplemented with ORS or natural lemon juice.\n• First Aid Notice: If experiencing dizziness, rapid pulse, or lack of sweating, seek immediate shade and call emergency medical support at 108.\n• Home Cooling: Keep window blinds drawn during peak sun hours; use damp curtains to cool interior airflow.`,
-      Farmer: `🌾 AGRICULTURAL HEAT ADVISORY - ${(city || '').toUpperCase()}\n\n• Crop Protection: Conduct light micro-irrigation only during early morning (5 AM - 7 AM) or late evening.\n• Livestock Care: Ensure cattle sheds are covered with thatch or wet gunny bags. Provide continuous access to shade.\n• Field Work Timings: Shift all manual harvesting and field labor strictly to early morning hours before 10:30 AM.`,
-      Hospital: `🏥 HEALTHCARE SYSTEM EMERGENCY PREPAREDNESS ADVISORY\n\n• Ward Readiness: Reserve at least 15% dedicated bed capacity for Heat Stroke & Heat Exhaustion cases.\n• Resource Supply: Ensure 100% stock availability of IV normal saline fluids, ORS packs, cooling blankets, and ice packs.\n• Triage Protocol: Fast-track patients with body temperature > 103°F directly to cold immersion/cooling units.`,
-      Municipality: `🏙️ MUNICIPAL ADMINISTRATION ACTION PLAN - ${(city || '').toUpperCase()}\n\n• Public Infrastructure: Activate public misting stations at major bus stands and railway hubs.\n• Water Supply: Ensure uninterrupted water pipeline pressure and deploy mobile water tankers.\n• Labor Safety: Enforce mandatory 2-hour rest periods for road construction workers between 1 PM and 3 PM.`
-    };
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    
+    let advisoryText = '';
 
-    const advisoryText = templates[audience] || templates['Citizen'];
+    if (!GROQ_API_KEY) {
+      // Fallback if no API key is provided
+      advisoryText = `[Simulated Fallback - Please configure GROQ_API_KEY]\n\nHeatwave advisory for ${audience} in ${city} (Temp: ${temp || 'N/A'}, Severity: ${severity || 'Moderate'}). Stay hydrated and avoid direct sunlight.`;
+    } else {
+      // Call Groq API
+      const prompt = `You are a climate crisis expert. Generate a concise, 3-bullet-point heatwave advisory for a ${audience} in ${city}. The current temperature is ${temp || 'N/A'}°C and the severity is ${severity || 'Moderate'}. Do not include pleasantries, just output the actionable advice.`;
+      
+      const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama3-8b-8192',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.5,
+          max_tokens: 250
+        })
+      });
+
+      if (!groqResponse.ok) {
+        throw new Error('Groq API request failed');
+      }
+
+      const groqData = await groqResponse.json();
+      advisoryText = groqData.choices[0].message.content;
+    }
 
     res.json({
       city: city,
@@ -57,11 +80,11 @@ router.get('/generate', async (req, res) => {
       audience: audience,
       text: advisoryText,
       generatedAt: new Date().toISOString(),
-      model: 'HeatwaveAdvisory-LSTM-v3.4'
+      model: 'Groq-Llama-3-8B'
     });
   } catch (err) {
     console.error('Error generating advisory:', err);
-    res.status(500).json({ error: 'Failed to generate advisory' });
+    res.status(500).json({ error: 'Failed to generate advisory with AI' });
   }
 });
 
