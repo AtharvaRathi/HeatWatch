@@ -1,5 +1,5 @@
 const express = require('express');
-
+const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
@@ -11,6 +11,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb:27017/heatwave_monolithic';
 
 // ============================================
 // MONOLITHIC ARCHITECTURE
@@ -79,11 +80,19 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Start Server (In-Memory Data Mode)
-app.listen(PORT, () => {
-  console.log(`✅ Monolithic Server running on port ${PORT} (In-Memory Mode)`);
-  console.log(`📋 Architecture: MONOLITHIC (all services in one process)`);
-  console.log(`🔗 All endpoints available at http://localhost:${PORT}`);
-});
+// MongoDB Connection & Server Start
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log(`✅ Monolithic Server connected to MongoDB`);
+    app.listen(PORT, () => {
+      console.log(`🏗️  Monolithic Server running on port ${PORT}`);
+      console.log(`📋 Architecture: MONOLITHIC (all services in one process)`);
+      console.log(`🔗 All endpoints available at http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 module.exports = app;

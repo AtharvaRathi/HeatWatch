@@ -18,6 +18,7 @@ const HeatwaveHotspots = () => {
   const [selectedColor, setSelectedColor] = useState('All');
   const [selectedState, setSelectedState] = useState('All');
   const [sortBy, setSortBy] = useState('riskScore');
+  const [hotspotsData, setHotspotsData] = useState([]);
 
   useEffect(() => {
     fetchCitiesWeather().then(res => {

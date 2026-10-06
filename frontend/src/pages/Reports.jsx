@@ -21,6 +21,7 @@ const Reports = () => {
   const [selectedReportPreview, setSelectedReportPreview] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [reportsData, setReportsData] = useState([]);
 
   useEffect(() => {
     fetchReports().then(res => setReportsData(res || []));
