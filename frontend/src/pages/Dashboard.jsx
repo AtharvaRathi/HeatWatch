@@ -36,12 +36,14 @@ const itemVariants = {
 const Dashboard = () => {
   const [selectedCityTrend, setSelectedCityTrend] = useState('Nagpur');
 
-  // API data state with mockData fallback
-  const [dashboardStats, setDashboardStats] = useState(mockDashboardStats);
-  const [weeklyForecast, setWeeklyForecast] = useState(mockWeeklyForecast);
-  const [hotspots, setHotspots] = useState(mockHotspots);
-  const [alerts, setAlerts] = useState(mockAlerts);
-  const [analyticsData, setAnalyticsData] = useState(mockAnalyticsData);
+  // API data state without mockData fallback (to force real data)
+  const [dashboardStats, setDashboardStats] = useState({
+    currentAvgTemp: '--', avgTempTrend: '--', activeAlertsCount: 0, alertsBreakdown: '--', affectedRegionsCount: 0, affectedRegionsDetail: '--', highestRecordedTemp: '--', highestLocation: '--', predictionAccuracy: '--', accuracyDetail: '--'
+  });
+  const [weeklyForecast, setWeeklyForecast] = useState([]);
+  const [hotspots, setHotspots] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState({ tempTrend7Days: [] });
 
   // Fetch from backend API on mount, fallback to mockData
   useEffect(() => {

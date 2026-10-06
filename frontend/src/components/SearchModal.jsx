@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, MapPin, Flame, AlertTriangle, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockCitiesWeather, mockAlerts } from '../data/mockData';
+import { fetchCitiesWeather, searchCityWeather } from '../services/api';
 
 const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
+  const [cities, setCities] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchCitiesWeather().then(res => setCities(res || []));
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -20,15 +27,25 @@ const SearchModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const filteredCities = mockCitiesWeather.filter(c => 
+  const filteredCities = cities.filter(c => 
     c.city.toLowerCase().includes(query.toLowerCase()) || 
     c.state.toLowerCase().includes(query.toLowerCase())
   );
 
-  const filteredAlerts = mockAlerts.filter(a =>
-    a.city.toLowerCase().includes(query.toLowerCase()) ||
-    a.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const handleLiveSearch = async () => {
+    if (!query) return;
+    try {
+      const res = await searchCityWeather(query);
+      if (res && !res.error) {
+        navigate('/monitoring');
+        onClose();
+      } else {
+        alert('City not found globally.');
+      }
+    } catch (e) {
+      alert('Search failed.');
+    }
+  };
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -118,30 +135,15 @@ const SearchModal = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* Alerts */}
-              {filteredAlerts.length > 0 && (
-                <div>
-                  <h4 className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-2">Matching Alerts</h4>
-                  <div className="space-y-1">
-                    {filteredAlerts.slice(0, 3).map((alert) => (
-                      <div
-                        key={alert.id}
-                        onClick={() => handleNavigate('/alerts')}
-                        className="flex items-start justify-between p-2.5 rounded-xl hover:bg-white/[0.04] cursor-pointer border border-transparent hover:border-white/[0.06] transition"
-                      >
-                        <div className="flex items-start gap-2.5">
-                          <AlertTriangle size={14} className="text-rose-400 mt-0.5" />
-                          <div>
-                            <div className="font-medium text-xs text-zinc-300">{alert.title}</div>
-                            <div className="text-[11px] text-zinc-500">{alert.city}, {alert.state}</div>
-                          </div>
-                        </div>
-                        <span className="text-xs text-rose-400 font-semibold">{alert.temp}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Global Search Button if no exact match */}
+              <div className="pt-2">
+                <button
+                  onClick={handleLiveSearch}
+                  className="w-full py-3 rounded-xl border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition text-xs font-medium uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  <Search size={14} /> Search Web for "{query}"
+                </button>
+              </div>
             </>
           )}
         </div>
