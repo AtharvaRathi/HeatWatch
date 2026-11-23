@@ -43,7 +43,7 @@ const AIAdvisoryGenerator = () => {
       if (res && res.text) {
         setAdvisoryText(res.text);
       } else {
-        setAdvisoryText(`[Error] The AI model failed to generate a response. Please ensure GROQ_API_KEY is configured in the backend.`);
+        setAdvisoryText(`[Error] The local Ollama model failed to generate a response in time. Ensure it is running or try a lighter model.`);
       }
     } catch (err) {
       setAdvisoryText(`[Error] Failed to connect to the AI microservice.`);

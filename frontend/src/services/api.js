@@ -17,7 +17,7 @@ const ANALYTICS_API_URL = import.meta.env.VITE_ANALYTICS_API_URL || API_BASE_URL
  */
 async function fetchAPI(baseUrl, endpoint, options = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+  const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout for local LLMs
 
   try {
     const url = new URL(endpoint.startsWith('/') ? endpoint.slice(1) : endpoint, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).toString();

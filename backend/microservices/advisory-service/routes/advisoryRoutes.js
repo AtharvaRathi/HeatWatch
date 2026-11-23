@@ -40,16 +40,10 @@ router.get('/generate', async (req, res) => {
       return res.status(400).json({ error: 'City and audience parameters are required' });
     }
 
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    
     let advisoryText = '';
+    const OLLAMA_URL = 'http://host.docker.internal:11434/api/generate';
 
-    if (!GROQ_API_KEY) {
-      // Fallback if no API key is provided
-      advisoryText = `[Simulated Fallback - Please configure GROQ_API_KEY]\n\nHeatwave advisory for ${audience} in ${city} (Temp: ${temp || 'N/A'}, Severity: ${severity || 'Moderate'}). Stay hydrated and avoid direct sunlight.`;
-    } else {
-      // Call Groq API
-      const prompt = `You are "HeatWatch AI", an advanced climate resilience intelligence system. 
+    const prompt = `You are "HeatWatch AI", an advanced climate resilience intelligence system. 
 Generate a real-time, highly customized heatwave advisory for the '${audience}' sector in '${city}'. 
 Current Telemetry: Temperature is ${temp || 'N/A'}°C, Severity Level is ${severity || 'Moderate'}.
 
@@ -60,28 +54,32 @@ Format your response exactly like this:
 [TARGETED ACTION PROTOCOLS]
 (Provide 3 highly specific, actionable, and scientific protocols tailored exactly to the ${audience} sector to mitigate ${severity} risk at ${temp}°C).
 
-Always conclude exactly with: "/// Generated in real-time by HeatWatch AI / Model: Llama-3 ///". Keep the total response under 150 words.`;
+Always conclude exactly with: "/// Generated in real-time by HeatWatch AI / Model: Qwen-2.5-7B (Docker-Offline) ///". Keep the total response under 150 words.`;
       
-      const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    try {
+      const ollamaResponse = await fetch(OLLAMA_URL, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama3-8b-8192',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.5,
-          max_tokens: 250
+          model: 'qwen2.5:7b',
+          prompt: prompt,
+          stream: false,
+          options: {
+            temperature: 0.5,
+            num_predict: 250
+          }
         })
       });
 
-      if (!groqResponse.ok) {
-        throw new Error('Groq API request failed');
+      if (!ollamaResponse.ok) {
+        throw new Error('Ollama API request failed');
       }
 
-      const groqData = await groqResponse.json();
-      advisoryText = groqData.choices[0].message.content;
+      const ollamaData = await ollamaResponse.json();
+      advisoryText = ollamaData.response;
+    } catch (ollamaErr) {
+      console.warn("⚠️ Ollama failed, falling back to simulated:", ollamaErr.message);
+      advisoryText = `[Simulated Fallback - Ensure Ollama is running on host port 11434]\n\nHeatwave advisory for ${audience} in ${city} (Temp: ${temp || 'N/A'}, Severity: ${severity || 'Moderate'}). Stay hydrated and avoid direct sunlight.`;
     }
 
     res.json({
@@ -91,7 +89,7 @@ Always conclude exactly with: "/// Generated in real-time by HeatWatch AI / Mode
       audience: audience,
       text: advisoryText,
       generatedAt: new Date().toISOString(),
-      model: 'Groq-Llama-3-8B'
+      model: 'Ollama-Qwen-2.5-7B-Docker'
     });
   } catch (err) {
     console.error('Error generating advisory:', err);
